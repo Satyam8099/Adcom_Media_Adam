@@ -36,7 +36,7 @@ def _llm_key() -> Optional[str]:
 
 def _model_name() -> str:
     # Changed to Google Gemini's free model
-    return "gemini-1.5-flash"
+    return "gemini-1.5-flash-latest"
 
 
 PROFILE_FIELDS = [
