@@ -16,10 +16,16 @@ Build a world-class, premium digital marketing agency website for **Adcom Media*
 - Blog posts migrated to MongoDB with view counters + popular-post analytics dashboard
 
 ## Recent Changes
-- **2026-08 (this run)** — **Lead Inbox at `/adcom-admin`**: new "Lead inbox" tab shows every ADAM lead with status badge + score + transcript preview + one-click "Convert" button. Detail modal shows full profile, ADAM business summary, website snapshot, 90-day roadmap and complete transcript. Filter chips per status (Draft/Qualified/Analysis Started/Analysis Completed/Contact Requested/Converted) + search across company/email/name. Backend endpoints: `GET /api/admin/leads` (list + filter + search), `GET /api/admin/leads/stats`, `GET /api/admin/leads/{lead_id}`, `PATCH /api/admin/leads/{lead_id}/status`, `DELETE /api/admin/leads/{lead_id}` — all admin-protected.
-- **2026-08 earlier** — Secure `/login` (email+password with bcrypt + brute-force + no user-enumeration), Google OAuth kept as secondary. sessionStorage intro replay. Secret ⓘ button + Konami discovery card. Return Visitor Continuity.
+- **2026-08 (this run)** — **13 new pages added** using the existing `ServicePage` template: 7 new services (`Google Ads`, `Meta Ads`, `SEO`, `Social Media Marketing`, `Website Development`, `LinkedIn Marketing`, `B2B Marketing`), 5 industries (`Furniture`, `Pharma`, `Manufacturing`, `B2B`, `E-commerce`), and 1 location page (`Pune`). Header menu overlay rebuilt with three grouped sections (Services / Industries / Locations) linking to all pages. Case-study cross-linking distributed by topical fit.
+- **2026-08 earlier** — Lead Inbox in `/adcom-admin` (list, filter, search, detail modal, one-click Convert). Secure `/login` with bcrypt + Google OAuth secondary. Intro replay via sessionStorage. Secret ⓘ button + Konami card. Return Visitor Continuity.
 - **2026-07** — ADAM v2 conversational workspace, `adam_leads` collection, /discover, /summary, /handover.
-- **2026-07** — Blog CMS + admin panel, view analytics, mobile ADAM activation.
+
+## Site Map
+- `/` · `/about` · `/process` · `/case-studies` · `/case-studies/{slug}` · `/careers` · `/contact` · `/blog` · `/blog/{slug}`
+- **Services** — `/services/growth-marketing`, `/services/performance-marketing`, `/services/google-ads`, `/services/meta-ads`, `/services/seo`, `/services/ai-seo`, `/services/social-media-marketing`, `/services/brand-strategy`, `/services/website-development`, `/services/linkedin-marketing`, `/services/b2b-marketing`
+- **Industries** — `/industries/furniture`, `/industries/pharma`, `/industries/manufacturing`, `/industries/b2b`, `/industries/ecommerce`
+- **Locations** — `/locations/pune`
+- **Admin** — `/login`, `/adcom-admin` (Essays + Lead inbox tabs)
 
 ## Architecture
 - `/app/frontend/src/pages/Login.jsx` — internal password login (with Google as secondary)
