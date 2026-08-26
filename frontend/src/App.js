@@ -22,6 +22,19 @@ import PerformanceMarketing from '@/pages/PerformanceMarketing';
 import GrowthMarketing from '@/pages/GrowthMarketing';
 import BrandStrategy from '@/pages/BrandStrategy';
 import AISEO from '@/pages/AISEO';
+import GoogleAds from '@/pages/GoogleAds';
+import MetaAds from '@/pages/MetaAds';
+import SEO from '@/pages/SEO';
+import SocialMediaMarketing from '@/pages/SocialMediaMarketing';
+import WebsiteDevelopment from '@/pages/WebsiteDevelopment';
+import LinkedInMarketing from '@/pages/LinkedInMarketing';
+import B2BMarketing from '@/pages/B2BMarketing';
+import IndustryFurniture from '@/pages/IndustryFurniture';
+import IndustryPharma from '@/pages/IndustryPharma';
+import IndustryManufacturing from '@/pages/IndustryManufacturing';
+import IndustryB2B from '@/pages/IndustryB2B';
+import IndustryEcommerce from '@/pages/IndustryEcommerce';
+import LocationPune from '@/pages/LocationPune';
 import About from '@/pages/About';
 import ProcessPage from '@/pages/Process';
 import CaseStudiesPage from '@/pages/CaseStudiesPage';
@@ -79,6 +92,19 @@ function AppRouter() {
         <Route path="/services/growth-marketing" element={<GrowthMarketing />} />
         <Route path="/services/brand-strategy" element={<BrandStrategy />} />
         <Route path="/services/ai-seo" element={<AISEO />} />
+        <Route path="/services/google-ads" element={<GoogleAds />} />
+        <Route path="/services/meta-ads" element={<MetaAds />} />
+        <Route path="/services/seo" element={<SEO />} />
+        <Route path="/services/social-media-marketing" element={<SocialMediaMarketing />} />
+        <Route path="/services/website-development" element={<WebsiteDevelopment />} />
+        <Route path="/services/linkedin-marketing" element={<LinkedInMarketing />} />
+        <Route path="/services/b2b-marketing" element={<B2BMarketing />} />
+        <Route path="/industries/furniture" element={<IndustryFurniture />} />
+        <Route path="/industries/pharma" element={<IndustryPharma />} />
+        <Route path="/industries/manufacturing" element={<IndustryManufacturing />} />
+        <Route path="/industries/b2b" element={<IndustryB2B />} />
+        <Route path="/industries/ecommerce" element={<IndustryEcommerce />} />
+        <Route path="/locations/pune" element={<LocationPune />} />
         <Route path="/about" element={<About />} />
         <Route path="/process" element={<ProcessPage />} />
         <Route path="/case-studies" element={<CaseStudiesPage />} />
