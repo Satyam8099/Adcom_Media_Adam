@@ -17,6 +17,8 @@ from auth import build_auth_router, seed_admin
 from blogs import build_blog_router, seed_blogs_if_empty
 from adam_intel import build_adam_router
 from adam_leads import build_adam_leads_router
+from admin_extras import build_admin_extras_router
+from sitemap import build_sitemap_router
 
 
 ROOT_DIR = Path(__file__).parent
@@ -268,6 +270,8 @@ app.include_router(build_adam_router())
 _leads_router, _leads_admin_router = build_adam_leads_router(db, _require_admin)
 app.include_router(_leads_router)
 app.include_router(_leads_admin_router)
+app.include_router(build_admin_extras_router(db, _require_admin))
+app.include_router(build_sitemap_router(db, base_url=os.environ.get('PUBLIC_SITE_URL', 'https://adcom-vault.preview.emergentagent.com')))
 
 app.add_middleware(
     CORSMiddleware,

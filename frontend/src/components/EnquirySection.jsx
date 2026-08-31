@@ -6,7 +6,7 @@ import { Send, Check, Loader2 } from 'lucide-react';
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 /**
- * EnquirySection — a compact, on-brand enquiry form that matches Contact.jsx styling.
+ * EnquirySection, a compact, on-brand enquiry form that matches Contact.jsx styling.
  *
  * config props:
  *   kicker, headline (JSX or string), description, cta, microcopy, source
@@ -82,7 +82,7 @@ export default function EnquirySection({
             )}
           </div>
 
-          {/* Right — form */}
+          {/* Right, form */}
           <div className="lg:col-span-7">
             <div className="rounded-3xl border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] backdrop-blur-sm overflow-hidden">
               <AnimatePresence mode="wait">

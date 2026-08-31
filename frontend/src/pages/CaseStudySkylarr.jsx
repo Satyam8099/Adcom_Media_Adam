@@ -46,13 +46,13 @@ const data = {
   work: {
     kicker: 'What actually shipped',
     title: 'Website first.<br /><span class="text-white/40">Then the engine around it.</span>',
-    body: 'A redesign and an SEO engine, delivered as one system — because in PCD pharma, the site is the sales team.',
+    body: 'A redesign and an SEO engine, delivered as one system, because in PCD pharma, the site is the sales team.',
     items: [
       { t: 'Website rebuild', d: 'Redesigned around the distributor journey, from monograph to enquiry.' },
-      { t: 'Technical SEO', d: 'Speed, crawl, schema, site architecture — every fundamental cleaned.' },
+      { t: 'Technical SEO', d: 'Speed, crawl, schema, site architecture, every fundamental cleaned.' },
       { t: 'On-page SEO', d: 'Product, therapy-area and franchise pages rebuilt for intent-led queries.' },
       { t: 'Content strategy', d: 'A content plan mapped to the questions distributors actually type.' },
-      { t: 'Lead generation', d: 'Enquiry flows, WhatsApp handoff, CRM routing — the pipeline behind the SEO.' },
+      { t: 'Lead generation', d: 'Enquiry flows, WhatsApp handoff, CRM routing, the pipeline behind the SEO.' },
       { t: 'Measurement layer', d: 'A monthly business review the founder actually reads.' },
     ],
   },

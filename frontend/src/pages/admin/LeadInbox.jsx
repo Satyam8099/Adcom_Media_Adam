@@ -182,10 +182,10 @@ function LeadDetail({ lead, onClose, onMutate }) {
               <div>
                 <div className="adam-mono text-[10px] uppercase tracking-[0.28em] text-[#F43F5E] mb-3">ADAM · Business summary</div>
                 <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 space-y-2 text-sm leading-relaxed">
-                  <div><span className="text-white/45">Business — </span>{bizSum.business}</div>
-                  <div><span className="text-white/45">Goal — </span>{bizSum.primary_goal}</div>
-                  <div><span className="text-white/45">Challenge — </span>{bizSum.current_challenge}</div>
-                  <div><span className="text-white/45">Opportunity — </span><span className="text-white">{bizSum.opportunity}</span></div>
+                  <div><span className="text-white/45">Business, </span>{bizSum.business}</div>
+                  <div><span className="text-white/45">Goal, </span>{bizSum.primary_goal}</div>
+                  <div><span className="text-white/45">Challenge, </span>{bizSum.current_challenge}</div>
+                  <div><span className="text-white/45">Opportunity, </span><span className="text-white">{bizSum.opportunity}</span></div>
                 </div>
               </div>
             )}
@@ -193,10 +193,10 @@ function LeadDetail({ lead, onClose, onMutate }) {
               <div>
                 <div className="adam-mono text-[10px] uppercase tracking-[0.28em] text-[#F43F5E] mb-3">ADAM · Website snapshot</div>
                 <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 space-y-2 text-sm leading-relaxed">
-                  <div><span className="text-white/45">Working — </span>{webSum.whats_working}</div>
-                  <div><span className="text-white/45">Attention — </span>{webSum.needs_attention}</div>
-                  <div><span className="text-white/45">Opportunity — </span>{webSum.biggest_opportunity}</div>
-                  <div><span className="text-white/45">Quick win — </span><span className="text-white">{webSum.quick_win}</span></div>
+                  <div><span className="text-white/45">Working, </span>{webSum.whats_working}</div>
+                  <div><span className="text-white/45">Attention, </span>{webSum.needs_attention}</div>
+                  <div><span className="text-white/45">Opportunity, </span>{webSum.biggest_opportunity}</div>
+                  <div><span className="text-white/45">Quick win, </span><span className="text-white">{webSum.quick_win}</span></div>
                 </div>
               </div>
             )}

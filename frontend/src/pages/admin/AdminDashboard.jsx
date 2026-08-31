@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Pencil, Trash2, Eye, LogOut, BarChart3, X, ArrowUpRight, Inbox, FileText } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, LogOut, BarChart3, X, ArrowUpRight, Inbox, FileText, Mail, Settings as SettingsIcon, LayoutDashboard } from 'lucide-react';
 import { apiGet, apiPost, apiPatch, apiDelete } from '@/lib/api';
 import LeadInbox from './LeadInbox';
+import { Overview, Enquiries, Settings } from './AdminExtras';
 
 function StatCard({ label, value, testid }) {
   return (
@@ -22,6 +23,9 @@ const EMPTY_POST = {
   author: { name: 'Adcom Studio', role: 'Editorial', avatar: 'https://i.pravatar.cc/120?img=8' },
   body: [],
   published: true,
+  seo_title: '',
+  meta_description: '',
+  og_image: '',
 };
 
 function BlogEditor({ initial, onCancel, onSaved }) {
@@ -42,6 +46,9 @@ function BlogEditor({ initial, onCancel, onSaved }) {
         author: form.author,
         body: form.body.split(/\n{2,}/).map((s) => s.trim()).filter(Boolean),
         published: !!form.published,
+        seo_title: form.seo_title || null,
+        meta_description: form.meta_description || null,
+        og_image: form.og_image || null,
       };
       if (isEdit) {
         const updated = await apiPatch(`/admin/blogs/${initial.id}`, payload);
@@ -109,6 +116,22 @@ function BlogEditor({ initial, onCancel, onSaved }) {
             <textarea data-testid="admin-editor-body" value={form.body} onChange={(e) => upd('body', e.target.value)} rows={14} className={`${inp} font-mono text-sm leading-relaxed`} />
           </Field>
 
+          {/* SEO */}
+          <div className="pt-4 border-t border-white/10">
+            <div className="adam-mono text-[10px] uppercase tracking-[0.3em] text-[#F43F5E] mb-4">SEO</div>
+            <div className="space-y-4">
+              <Field label="SEO title">
+                <input value={form.seo_title || ''} onChange={(e) => upd('seo_title', e.target.value)} data-testid="admin-editor-seo-title" placeholder="Overrides the H1 for search engines" className={inp} />
+              </Field>
+              <Field label="Meta description">
+                <textarea value={form.meta_description || ''} onChange={(e) => upd('meta_description', e.target.value)} rows={2} placeholder="150-160 char summary shown on SERPs" className={inp} />
+              </Field>
+              <Field label="OG image URL">
+                <input value={form.og_image || ''} onChange={(e) => upd('og_image', e.target.value)} placeholder="1200x630, defaults to the cover" className={inp} />
+              </Field>
+            </div>
+          </div>
+
           {err && <div className="text-sm text-[#F43F5E]">{err}</div>}
 
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
@@ -132,7 +155,7 @@ const Field = ({ label, children }) => (
 );
 
 export default function AdminDashboard({ user, onSignedOut }) {
-  const [tab, setTab] = useState('essays'); // essays | leads
+  const [tab, setTab] = useState('overview'); // overview | essays | leads | enquiries | settings
   const [posts, setPosts] = useState([]);
   const [analytics, setAnalytics] = useState(null);
   const [editing, setEditing] = useState(null);
@@ -188,16 +211,25 @@ export default function AdminDashboard({ user, onSignedOut }) {
         </div>
         {/* Tabs */}
         <div className="max-w-7xl mx-auto px-6 border-t border-white/[0.06]">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 overflow-x-auto">
+            <TabButton active={tab === 'overview'} onClick={() => setTab('overview')} icon={LayoutDashboard} label="Overview" testid="tab-overview" />
             <TabButton active={tab === 'essays'} onClick={() => setTab('essays')} icon={FileText} label="Essays" testid="tab-essays" />
             <TabButton active={tab === 'leads'} onClick={() => setTab('leads')} icon={Inbox} label="Lead inbox" testid="tab-leads" />
+            <TabButton active={tab === 'enquiries'} onClick={() => setTab('enquiries')} icon={Mail} label="Enquiries" testid="tab-enquiries" />
+            <TabButton active={tab === 'settings'} onClick={() => setTab('settings')} icon={SettingsIcon} label="Settings" testid="tab-settings" />
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-10 md:py-14">
-        {tab === 'leads' ? (
+        {tab === 'overview' ? (
+          <Overview goTo={setTab} />
+        ) : tab === 'leads' ? (
           <LeadInbox />
+        ) : tab === 'enquiries' ? (
+          <Enquiries />
+        ) : tab === 'settings' ? (
+          <Settings />
         ) : (
           <>
         {/* Hero row */}

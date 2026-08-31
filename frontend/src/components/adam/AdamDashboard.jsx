@@ -80,7 +80,7 @@ function Waveform() {
   );
 }
 
-/** Step 3 — the ADAM operating system dashboard. */
+/** Step 3, the ADAM operating system dashboard. */
 export default function AdamDashboard({ dimmed = false }) {
   const [clock, setClock] = useState('');
 

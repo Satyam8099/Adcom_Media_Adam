@@ -65,7 +65,7 @@ function CountUp({ to, suffix = '', prefix = '', separator = false, decimals = 0
   return <span ref={ref}>{prefix}{display}{suffix}</span>;
 }
 
-/* ----------------- 01 — Hero ----------------- */
+/* ----------------- 01, Hero ----------------- */
 
 function Hero() {
   const ref = useRef(null);
@@ -151,7 +151,7 @@ function Hero() {
   );
 }
 
-/* ----------------- 02 — Reality ----------------- */
+/* ----------------- 02, Reality ----------------- */
 
 function Reality() {
   return (
@@ -201,7 +201,7 @@ function Reality() {
   );
 }
 
-/* ----------------- 03 — Thesis + Cards ----------------- */
+/* ----------------- 03, Thesis + Cards ----------------- */
 
 const pillars = [
   { n: '01', t: 'Founder Voice',       Icon: Users,     d: 'Positioned the founder as the technical authority the industry already knew, on the surface it lives on.' },
@@ -272,7 +272,7 @@ function Thesis() {
   );
 }
 
-/* ----------------- 04 — LinkedIn KPIs ----------------- */
+/* ----------------- 04, LinkedIn KPIs ----------------- */
 
 function KPIs() {
   const kpis = [
@@ -376,11 +376,11 @@ function KPIs() {
   );
 }
 
-/* ----------------- 05 — What we did / process ----------------- */
+/* ----------------- 05, What we did / process ----------------- */
 
 const workItems = [
   { t: 'Founder-first editorial', d: 'Turned the founder&apos;s decades of plant-floor experience into a weekly LinkedIn editorial, ghost-written with technical fidelity.' },
-  { t: 'Case-teardown format',    d: 'Broke down real Prochem projects — cement, chemical, process — as short field notes engineers wanted to save.' },
+  { t: 'Case-teardown format',    d: 'Broke down real Prochem projects, cement, chemical, process, as short field notes engineers wanted to save.' },
   { t: 'Category commentary',     d: 'Timely takes on industry news (CAPEX cycles, plant safety, EPC norms) that only an operator could credibly write.' },
   { t: 'Employee amplification',  d: 'Made it easy for the internal engineering team to share, comment and add their own voice, without it feeling forced.' },
   { t: 'Buyer targeting',         d: 'Optimised connection requests and outreach for plant heads, procurement leads and consultants in specific SIC verticals.' },
@@ -440,7 +440,7 @@ function WhatWeDid() {
   );
 }
 
-/* ----------------- 06 — Content examples (mock LinkedIn posts) ----------------- */
+/* ----------------- 06, Content examples (mock LinkedIn posts) ----------------- */
 
 const feed = [
   { tag: 'Field notes', title: 'What we learned commissioning a 200 TPD plant in 43 days.', reactions: '312', comments: '18', img: PLANT_3 },
@@ -517,7 +517,7 @@ function ContentShowcase() {
   );
 }
 
-/* ----------------- 07 — Buyer journey ----------------- */
+/* ----------------- 07, Buyer journey ----------------- */
 
 const journey = [
   { Icon: Eye,          t: 'Sees a Prochem field note',        d: 'On the LinkedIn feed of a plant head they respect.' },
@@ -572,7 +572,7 @@ function BuyerJourney() {
   );
 }
 
-/* ----------------- 08 — Founder spotlight ----------------- */
+/* ----------------- 08, Founder spotlight ----------------- */
 
 function FounderSpotlight() {
   return (
@@ -633,7 +633,7 @@ function FounderSpotlight() {
   );
 }
 
-/* ----------------- 09 — Final outcome ----------------- */
+/* ----------------- 09, Final outcome ----------------- */
 
 function FinalOutcome() {
   return (

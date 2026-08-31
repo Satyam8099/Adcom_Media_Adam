@@ -156,7 +156,7 @@ export default function Footer() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        {/* Mobile-only ADAM activation button — discreet, on-brand */}
+        {/* Mobile-only ADAM activation button, discreet, on-brand */}
         <div className="md:hidden flex justify-center mt-10">
           <button
             type="button"
