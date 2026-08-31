@@ -46,6 +46,11 @@ class PasswordLoginRequest(BaseModel):
     password: str = Field(..., min_length=1, max_length=200)
 
 
+class PasswordChangeRequest(BaseModel):
+    current_password: str = Field(..., min_length=1, max_length=200)
+    new_password: str = Field(..., min_length=8, max_length=200)
+
+
 class AuthUser(BaseModel):
     user_id: str
     email: str
@@ -77,9 +82,10 @@ async def seed_admin(db):
         })
         logger.info("Seeded admin %s", email)
     else:
-        # keep hash in sync with env
+        # Only reseed from env when the user has never rotated their own password
+        has_self_set = bool(existing.get("password_updated_at"))
         existing_hash = existing.get("password_hash") or ""
-        if not existing_hash or not _verify_password(password, existing_hash):
+        if not existing_hash or (not has_self_set and not _verify_password(password, existing_hash)):
             await db.users.update_one(
                 {"email": email},
                 {"$set": {"password_hash": _hash_password(password), "role": existing.get("role") or "chief"}},
@@ -288,5 +294,31 @@ def build_auth_router(db) -> APIRouter:
             await db.user_sessions.delete_one({"session_token": token})
         response.delete_cookie("session_token", path="/", samesite="none", secure=True)
         return {"ok": True}
+
+    @router.post("/change-password")
+    async def change_password(payload: PasswordChangeRequest, request: Request, user: AuthUser = Depends(get_current_user)):
+        """Change the current user's password. Requires current password verification."""
+        if len(payload.new_password) < 8:
+            raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
+        if payload.current_password == payload.new_password:
+            raise HTTPException(status_code=400, detail="New password must differ from current")
+
+        user_doc = await db.users.find_one({"user_id": user.user_id}, {"_id": 0})
+        if not user_doc or not user_doc.get("password_hash"):
+            raise HTTPException(status_code=400, detail="Password login not enabled for this account")
+        if not _verify_password(payload.current_password, user_doc["password_hash"]):
+            raise HTTPException(status_code=401, detail="Current password is incorrect")
+
+        # Update hash and revoke all other sessions for this user (keep current)
+        current_token = request.cookies.get("session_token")
+        await db.users.update_one(
+            {"user_id": user.user_id},
+            {"$set": {"password_hash": _hash_password(payload.new_password), "password_updated_at": datetime.now(timezone.utc).isoformat()}},
+        )
+        query = {"user_id": user.user_id}
+        if current_token:
+            query["session_token"] = {"$ne": current_token}
+        await db.user_sessions.delete_many(query)
+        return {"ok": True, "sessions_revoked": True}
 
     return router, get_current_user, require_admin

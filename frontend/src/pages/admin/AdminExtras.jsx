@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FileText, Inbox, Mail, Trash2, ChevronRight, TrendingUp, Users } from 'lucide-react';
-import { apiGet, apiPut, apiDelete } from '@/lib/api';
+import { FileText, Inbox, Mail, Trash2, ChevronRight, TrendingUp, Users, KeyRound, Eye, EyeOff, Check } from 'lucide-react';
+import { apiGet, apiPut, apiPost, apiDelete } from '@/lib/api';
 
 /* -------------------- Overview -------------------- */
 export function Overview({ goTo }) {
@@ -210,6 +210,71 @@ export function Settings() {
           {saving ? 'Saving...' : 'Save changes'}
         </button>
       </div>
+
+      <PasswordCard />
     </div>
+  );
+}
+
+function PasswordCard() {
+  const [current, setCurrent] = useState('');
+  const [next, setNext] = useState('');
+  const [confirmPw, setConfirmPw] = useState('');
+  const [show, setShow] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+  const [ok, setOk] = useState(false);
+  const submit = async (e) => {
+    e?.preventDefault?.();
+    setErr(''); setOk(false);
+    if (next.length < 8) return setErr('New password must be at least 8 characters.');
+    if (next !== confirmPw) return setErr('Passwords do not match.');
+    if (next === current) return setErr('New password must differ from current.');
+    setBusy(true);
+    try {
+      await apiPost('/auth/change-password', { current_password: current, new_password: next });
+      setOk(true);
+      setCurrent(''); setNext(''); setConfirmPw('');
+      setTimeout(() => setOk(false), 3500);
+    } catch (e2) { setErr(e2.message || 'Password change failed.'); }
+    finally { setBusy(false); }
+  };
+  const inp2 = 'w-full px-4 py-3 pr-11 rounded-xl bg-black border border-white/10 focus:border-[#F43F5E] outline-none text-white text-sm placeholder:text-white/25';
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6" data-testid="password-card">
+      <div className="adam-mono text-[10px] uppercase tracking-[0.3em] text-[#F43F5E] mb-5 flex items-center gap-2"><KeyRound size={12} /> Password</div>
+      <form onSubmit={submit} className="grid md:grid-cols-3 gap-4">
+        <PwField label="Current password" value={current} onChange={setCurrent} show={show} testid="pw-current" placeholder="Your current password" inp={inp2} />
+        <PwField label="New password" value={next} onChange={setNext} show={show} testid="pw-new" placeholder="8+ characters" inp={inp2} />
+        <PwField label="Confirm new password" value={confirmPw} onChange={setConfirmPw} show={show} testid="pw-confirm" placeholder="Repeat the new password" inp={inp2} />
+        <div className="md:col-span-3 flex items-center justify-between flex-wrap gap-3">
+          <label className="inline-flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" checked={show} onChange={(e) => setShow(e.target.checked)} className="w-4 h-4 accent-[#F43F5E]" />
+            <span className="adam-mono text-[10px] uppercase tracking-[0.24em] text-white/50">Show passwords</span>
+          </label>
+          <div className="flex items-center gap-3">
+            {err && <span className="text-xs text-[#F43F5E]">{err}</span>}
+            {ok && <span className="adam-mono text-[10px] uppercase tracking-widest text-emerald-300 inline-flex items-center gap-1"><Check size={11} /> Updated · other sessions revoked</span>}
+            <button type="submit" disabled={busy || !current || !next || !confirmPw} data-testid="pw-submit" className="px-5 py-2.5 rounded-full bg-[#E11D2E] text-white text-sm font-semibold hover:bg-[#ff2f45] disabled:opacity-40">
+              {busy ? 'Updating…' : 'Update password'}
+            </button>
+          </div>
+        </div>
+      </form>
+      <div className="mt-4 text-[11px] text-white/40 leading-relaxed">
+        Updating your password will sign out every other browser you are logged in on. Your current session stays active.
+      </div>
+    </div>
+  );
+}
+
+function PwField({ label, value, onChange, show, testid, placeholder, inp }) {
+  return (
+    <label className="block">
+      <div className="adam-mono text-[10px] uppercase tracking-[0.28em] text-white/40 mb-2">{label}</div>
+      <div className="relative">
+        <input type={show ? 'text' : 'password'} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} data-testid={testid} autoComplete={testid === 'pw-current' ? 'current-password' : 'new-password'} className={inp} />
+      </div>
+    </label>
   );
 }

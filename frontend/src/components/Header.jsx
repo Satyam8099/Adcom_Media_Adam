@@ -27,6 +27,7 @@ const servicePages = [
   { label: 'Website Development', href: '/services/website-development' },
   { label: 'LinkedIn Marketing', href: '/services/linkedin-marketing' },
   { label: 'B2B Marketing', href: '/services/b2b-marketing' },
+  { label: 'Industrial 3D · Digital Showroom', href: '/services/industrial-3d' },
 ];
 
 const industryPages = [
