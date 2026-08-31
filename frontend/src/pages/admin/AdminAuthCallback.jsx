@@ -10,6 +10,11 @@ export default function AdminAuthCallback() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    document.body.classList.add('native-cursor');
+    return () => document.body.classList.remove('native-cursor');
+  }, []);
+
+  useEffect(() => {
     if (processed.current) return;
     processed.current = true;
 

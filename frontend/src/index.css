@@ -64,6 +64,17 @@ body {
     body { cursor: auto; }
 }
 
+/* Admin / auth surfaces use the native cursor for usability */
+body.native-cursor,
+body.native-cursor * { cursor: auto !important; }
+body.native-cursor input,
+body.native-cursor textarea { cursor: text !important; }
+body.native-cursor button,
+body.native-cursor a,
+body.native-cursor [role="button"],
+body.native-cursor [data-testid] button { cursor: pointer !important; }
+body.native-cursor .custom-cursor { display: none !important; }
+
 ::selection {
     background: #4f46e5;
     color: #fff;
