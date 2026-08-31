@@ -8,6 +8,7 @@ import { BlogEnquiry } from '@/components/enquiries';
 import FAQ from '@/components/FAQ';
 import CustomCursor from '@/components/CustomCursor';
 import { apiGet } from '@/lib/api';
+import useSEO from '@/hooks/useSEO';
 
 function renderParagraph(line, i) {
   if (line.startsWith('## ')) {
@@ -37,7 +38,12 @@ export default function BlogPost() {
   const { slug } = useParams();
   const [post, setPost] = useState(null);
   const [related, setRelated] = useState([]);
-  const [status, setStatus] = useState('loading'); // loading | ok | notfound
+  const [status, setStatus] = useState('loading');
+  useSEO(post ? `blog-${post.slug}` : null, {
+    title: post ? (post.seo_title || `${post.title} · Adcom Journal`) : null,
+    description: post ? (post.meta_description || post.excerpt) : null,
+    ogImage: post ? (post.og_image || post.cover) : null,
+  });
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });

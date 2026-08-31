@@ -16,16 +16,17 @@ Build a world-class, premium digital marketing agency website for **Adcom Media*
 - Blog posts migrated to MongoDB with view counters + popular-post analytics dashboard
 
 ## Recent Changes
-- **2026-08-31 (this run)** — **SEO + Admin expansion**: (1) `/robots.txt`, `/llm.txt` and `/api/sitemap.xml` (dynamic, includes all static routes + live blog slugs). (2) EM-dashes stripped site-wide across all 28 page/component files. (3) Admin panel expanded from 2 to 5 tabs: **Overview** (blog views / essays / leads / enquiries + recent activity), **Essays** (existing), **Lead inbox** (existing), **Enquiries** (contact + service form submissions with filter/detail/delete), **Settings** (Company / Contact / Social / Basic SEO grouped fields — persisted in `db.site_settings`). (4) Blog editor gained SEO fields: `seo_title`, `meta_description`, `og_image`.
-- **2026-08 earlier** — 13 new pages (7 services + 5 industries + Pune location), Lead Inbox, secure /login, sessionStorage intro replay, Secret ⓘ button + Konami card, Return Visitor Continuity.
+- **2026-08-31 late (this run)** — **Pages CMS**: New "Pages" admin tab with 24 editable pages (Home, About, Process, Case Studies index, Blog index, Careers, Contact, all 11 services, all 5 industries, Pune). Editor with SEO title (60-char counter), meta description (160-char counter), OG image URL, canonical URL, no-index toggle, and a live SERP preview card. Public endpoint `GET /api/page-seo/{key}`. New `useSEO` hook applies overrides to `<title>` + full OG/Twitter/canonical/robots meta tags. Wired into Landing/Blog/BlogPost/ServicePage (covers 22+ of the 24 pages).
+- **2026-08-31 earlier** — robots.txt, llm.txt, dynamic /api/sitemap.xml, EM-dash cleanup across 28 files, Admin panel Overview + Enquiries + Settings tabs, Blog SEO fields.
+- **2026-08 earlier** — 13 new pages, Lead Inbox, secure /login, sessionStorage intro replay, Secret ⓘ button + Konami card, Return Visitor Continuity.
 
 ## Backlog (P1)
 - **Portfolio CMS** — migrate the 5 hardcoded case studies into MongoDB with admin CRUD
-- **Pages CMS** — static-page SEO editor (Home / About / Services / Portfolio / Contact meta overrides)
 - **Media library** — image + document upload via Emergent object storage
 - **Blog category taxonomy** — replace free-text with a category collection
 - **Password Rotate** — in-dashboard password change
 - **Lead Export** — CSV export from Lead Inbox
+- **Site settings → head** — apply `default_seo_title` / `default_og_image` from Settings as global fallbacks
 
 ## Site Map
 - `/` · `/about` · `/process` · `/case-studies` · `/case-studies/{slug}` · `/careers` · `/contact` · `/blog` · `/blog/{slug}`

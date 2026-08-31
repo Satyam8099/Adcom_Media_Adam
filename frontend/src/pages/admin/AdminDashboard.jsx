@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Pencil, Trash2, Eye, LogOut, BarChart3, X, ArrowUpRight, Inbox, FileText, Mail, Settings as SettingsIcon, LayoutDashboard } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, LogOut, BarChart3, X, ArrowUpRight, Inbox, FileText, Mail, Settings as SettingsIcon, LayoutDashboard, Globe } from 'lucide-react';
 import { apiGet, apiPost, apiPatch, apiDelete } from '@/lib/api';
 import LeadInbox from './LeadInbox';
 import { Overview, Enquiries, Settings } from './AdminExtras';
+import PagesCMS from './PagesCMS';
 
 function StatCard({ label, value, testid }) {
   return (
@@ -214,6 +215,7 @@ export default function AdminDashboard({ user, onSignedOut }) {
           <div className="flex items-center gap-1 overflow-x-auto">
             <TabButton active={tab === 'overview'} onClick={() => setTab('overview')} icon={LayoutDashboard} label="Overview" testid="tab-overview" />
             <TabButton active={tab === 'essays'} onClick={() => setTab('essays')} icon={FileText} label="Essays" testid="tab-essays" />
+            <TabButton active={tab === 'pages'} onClick={() => setTab('pages')} icon={Globe} label="Pages" testid="tab-pages" />
             <TabButton active={tab === 'leads'} onClick={() => setTab('leads')} icon={Inbox} label="Lead inbox" testid="tab-leads" />
             <TabButton active={tab === 'enquiries'} onClick={() => setTab('enquiries')} icon={Mail} label="Enquiries" testid="tab-enquiries" />
             <TabButton active={tab === 'settings'} onClick={() => setTab('settings')} icon={SettingsIcon} label="Settings" testid="tab-settings" />
@@ -224,6 +226,8 @@ export default function AdminDashboard({ user, onSignedOut }) {
       <div className="max-w-7xl mx-auto px-6 py-10 md:py-14">
         {tab === 'overview' ? (
           <Overview goTo={setTab} />
+        ) : tab === 'pages' ? (
+          <PagesCMS />
         ) : tab === 'leads' ? (
           <LeadInbox />
         ) : tab === 'enquiries' ? (

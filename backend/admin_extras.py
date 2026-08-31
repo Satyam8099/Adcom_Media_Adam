@@ -22,6 +22,43 @@ class SiteSettings(BaseModel):
     default_og_image: Optional[str] = None
 
 
+class PageSEO(BaseModel):
+    seo_title: Optional[str] = None
+    meta_description: Optional[str] = None
+    og_image: Optional[str] = None
+    canonical: Optional[str] = None
+    no_index: Optional[bool] = False
+
+
+# Curated list of static pages the studio can edit SEO for.
+PAGE_CATALOG = [
+    {"key": "home", "label": "Home", "path": "/"},
+    {"key": "about", "label": "About", "path": "/about"},
+    {"key": "process", "label": "Process", "path": "/process"},
+    {"key": "case-studies", "label": "Portfolio / Case Studies", "path": "/case-studies"},
+    {"key": "blog", "label": "Blog (index)", "path": "/blog"},
+    {"key": "careers", "label": "Careers", "path": "/careers"},
+    {"key": "contact", "label": "Contact", "path": "/contact"},
+    {"key": "services-growth-marketing", "label": "Service · Growth Marketing", "path": "/services/growth-marketing"},
+    {"key": "services-performance-marketing", "label": "Service · Performance Marketing", "path": "/services/performance-marketing"},
+    {"key": "services-google-ads", "label": "Service · Google Ads", "path": "/services/google-ads"},
+    {"key": "services-meta-ads", "label": "Service · Meta Ads", "path": "/services/meta-ads"},
+    {"key": "services-seo", "label": "Service · SEO", "path": "/services/seo"},
+    {"key": "services-ai-seo", "label": "Service · AI SEO", "path": "/services/ai-seo"},
+    {"key": "services-social-media-marketing", "label": "Service · Social Media", "path": "/services/social-media-marketing"},
+    {"key": "services-brand-strategy", "label": "Service · Branding", "path": "/services/brand-strategy"},
+    {"key": "services-website-development", "label": "Service · Website Development", "path": "/services/website-development"},
+    {"key": "services-linkedin-marketing", "label": "Service · LinkedIn Marketing", "path": "/services/linkedin-marketing"},
+    {"key": "services-b2b-marketing", "label": "Service · B2B Marketing", "path": "/services/b2b-marketing"},
+    {"key": "industries-furniture", "label": "Industry · Furniture", "path": "/industries/furniture"},
+    {"key": "industries-pharma", "label": "Industry · Pharma", "path": "/industries/pharma"},
+    {"key": "industries-manufacturing", "label": "Industry · Manufacturing", "path": "/industries/manufacturing"},
+    {"key": "industries-b2b", "label": "Industry · B2B", "path": "/industries/b2b"},
+    {"key": "industries-ecommerce", "label": "Industry · E-commerce", "path": "/industries/ecommerce"},
+    {"key": "locations-pune", "label": "Location · Pune", "path": "/locations/pune"},
+]
+
+
 def build_admin_extras_router(db, require_admin) -> APIRouter:
     router = APIRouter(prefix="/api/admin", tags=["admin-extras"])
 
@@ -85,5 +122,47 @@ def build_admin_extras_router(db, require_admin) -> APIRouter:
             "recent_leads": recent_leads,
             "recent_enquiries": recent_enquiries,
         }
+
+    # ---------- Pages CMS (SEO overrides) ---------- #
+    @router.get("/pages")
+    async def list_pages(user=Depends(require_admin)):
+        stored = {}
+        async for d in db.page_seo.find({}, {"_id": 0}):
+            stored[d.get("key")] = d
+        return [
+            {
+                **p,
+                "seo_title": (stored.get(p["key"]) or {}).get("seo_title"),
+                "meta_description": (stored.get(p["key"]) or {}).get("meta_description"),
+                "og_image": (stored.get(p["key"]) or {}).get("og_image"),
+                "canonical": (stored.get(p["key"]) or {}).get("canonical"),
+                "no_index": (stored.get(p["key"]) or {}).get("no_index", False),
+                "updated_at": (stored.get(p["key"]) or {}).get("updated_at"),
+            }
+            for p in PAGE_CATALOG
+        ]
+
+    @router.put("/pages/{key}")
+    async def upsert_page_seo(key: str, payload: PageSEO, user=Depends(require_admin)):
+        catalog_keys = {p["key"] for p in PAGE_CATALOG}
+        if key not in catalog_keys:
+            raise HTTPException(status_code=404, detail="Unknown page")
+        data = {k: v for k, v in payload.model_dump().items() if v is not None}
+        data["key"] = key
+        data["updated_at"] = datetime.now(timezone.utc).isoformat()
+        await db.page_seo.update_one({"key": key}, {"$set": data}, upsert=True)
+        return await db.page_seo.find_one({"key": key}, {"_id": 0})
+
+    return router
+
+
+def build_public_seo_router(db) -> APIRouter:
+    """Unauthenticated read endpoint for the frontend head renderer."""
+    router = APIRouter(prefix="/api", tags=["public-seo"])
+
+    @router.get("/page-seo/{key}")
+    async def get_page_seo(key: str):
+        doc = await db.page_seo.find_one({"key": key}, {"_id": 0})
+        return doc or {}
 
     return router
