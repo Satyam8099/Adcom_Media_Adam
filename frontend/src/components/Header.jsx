@@ -18,8 +18,28 @@ const navLinks = [
 const servicePages = [
   { label: 'Growth Marketing', href: '/services/growth-marketing' },
   { label: 'Performance Marketing', href: '/services/performance-marketing' },
-  { label: 'Brand Strategy', href: '/services/brand-strategy' },
+  { label: 'Google Ads', href: '/services/google-ads' },
+  { label: 'Meta Ads', href: '/services/meta-ads' },
+  { label: 'SEO', href: '/services/seo' },
   { label: 'AI SEO', href: '/services/ai-seo' },
+  { label: 'Social Media Marketing', href: '/services/social-media-marketing' },
+  { label: 'Branding', href: '/services/brand-strategy' },
+  { label: 'Website Development', href: '/services/website-development' },
+  { label: 'LinkedIn Marketing', href: '/services/linkedin-marketing' },
+  { label: 'B2B Marketing', href: '/services/b2b-marketing' },
+  { label: 'Industrial 3D · Digital Showroom', href: '/services/industrial-3d' },
+];
+
+const industryPages = [
+  { label: 'Furniture', href: '/industries/furniture' },
+  { label: 'Pharma', href: '/industries/pharma' },
+  { label: 'Manufacturing', href: '/industries/manufacturing' },
+  { label: 'B2B', href: '/industries/b2b' },
+  { label: 'E-commerce', href: '/industries/ecommerce' },
+];
+
+const locationPages = [
+  { label: 'Pune', href: '/locations/pune' },
 ];
 
 export default function Header() {
@@ -265,8 +285,8 @@ function MenuOverlay({ open, onClose, go, goRoute }) {
                   </ul>
                 </nav>
 
-                {/* Right column, Services + contact */}
-                <div className="lg:col-span-5 flex flex-col gap-12">
+                {/* Right column, Services + Industries + Locations + contact */}
+                <div className="lg:col-span-5 flex flex-col gap-10">
                   <motion.div
                     custom={navLinks.length}
                     initial="hidden"
@@ -275,31 +295,84 @@ function MenuOverlay({ open, onClose, go, goRoute }) {
                     variants={linkVariants}
                   >
                     <div className="text-xs uppercase tracking-[0.25em] text-[#A0A0A0] mb-6">
-                      Service Pages
+                      Services
                     </div>
-                    <ul className="space-y-3">
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5">
                       {servicePages.map((s) => (
                         <li key={s.href}>
                           <button
                             data-testid={`overlay-service-${s.href.split('/').pop()}`}
                             onClick={() => goRoute(s.href)}
-                            className="group inline-flex items-center gap-2 text-[20px] md:text-[22px] font-medium text-white/85 hover:text-white transition-colors"
+                            className="group inline-flex items-center gap-2 text-[15px] font-medium text-white/85 hover:text-white transition-colors text-left"
                           >
-                            <span className="border-b border-white/20 group-hover:border-[#F43F5E] pb-1 transition-colors">
+                            <span className="border-b border-white/15 group-hover:border-[#F43F5E] pb-0.5 transition-colors">
                               {s.label}
                             </span>
-                            <ArrowUpRight size={16} className="text-[#F43F5E] group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                            <ArrowUpRight size={13} className="text-[#F43F5E] group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                           </button>
                         </li>
                       ))}
-                      <li className="text-sm text-[#A0A0A0] italic pt-1">
-                        Six other capabilities by request.
-                      </li>
                     </ul>
                   </motion.div>
 
                   <motion.div
                     custom={navLinks.length + 1}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    variants={linkVariants}
+                  >
+                    <div className="text-xs uppercase tracking-[0.25em] text-[#A0A0A0] mb-6">
+                      Industries
+                    </div>
+                    <ul className="grid grid-cols-2 gap-x-6 gap-y-2.5">
+                      {industryPages.map((s) => (
+                        <li key={s.href}>
+                          <button
+                            data-testid={`overlay-industry-${s.href.split('/').pop()}`}
+                            onClick={() => goRoute(s.href)}
+                            className="group inline-flex items-center gap-2 text-[15px] font-medium text-white/85 hover:text-white transition-colors text-left"
+                          >
+                            <span className="border-b border-white/15 group-hover:border-[#F43F5E] pb-0.5 transition-colors">
+                              {s.label}
+                            </span>
+                            <ArrowUpRight size={13} className="text-[#F43F5E] group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </motion.div>
+
+                  <motion.div
+                    custom={navLinks.length + 2}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    variants={linkVariants}
+                  >
+                    <div className="text-xs uppercase tracking-[0.25em] text-[#A0A0A0] mb-6">
+                      Locations
+                    </div>
+                    <ul className="flex flex-wrap gap-2.5">
+                      {locationPages.map((s) => (
+                        <li key={s.href}>
+                          <button
+                            data-testid={`overlay-location-${s.href.split('/').pop()}`}
+                            onClick={() => goRoute(s.href)}
+                            className="group inline-flex items-center gap-2 text-[15px] font-medium text-white/85 hover:text-white transition-colors"
+                          >
+                            <span className="border-b border-white/15 group-hover:border-[#F43F5E] pb-0.5 transition-colors">
+                              {s.label}
+                            </span>
+                            <ArrowUpRight size={13} className="text-[#F43F5E] group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </motion.div>
+
+                  <motion.div
+                    custom={navLinks.length + 3}
                     initial="hidden"
                     animate="visible"
                     exit="exit"
@@ -326,7 +399,7 @@ function MenuOverlay({ open, onClose, go, goRoute }) {
               </div>
 
               <motion.div
-                custom={navLinks.length + 2}
+                custom={navLinks.length + 4}
                 initial="hidden"
                 animate="visible"
                 exit="exit"

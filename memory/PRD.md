@@ -16,10 +16,24 @@ Build a world-class, premium digital marketing agency website for **Adcom Media*
 - Blog posts migrated to MongoDB with view counters + popular-post analytics dashboard
 
 ## Recent Changes
-- **2026-08 (this run)** — **Lead Inbox at `/adcom-admin`**: new "Lead inbox" tab shows every ADAM lead with status badge + score + transcript preview + one-click "Convert" button. Detail modal shows full profile, ADAM business summary, website snapshot, 90-day roadmap and complete transcript. Filter chips per status (Draft/Qualified/Analysis Started/Analysis Completed/Contact Requested/Converted) + search across company/email/name. Backend endpoints: `GET /api/admin/leads` (list + filter + search), `GET /api/admin/leads/stats`, `GET /api/admin/leads/{lead_id}`, `PATCH /api/admin/leads/{lead_id}/status`, `DELETE /api/admin/leads/{lead_id}` — all admin-protected.
-- **2026-08 earlier** — Secure `/login` (email+password with bcrypt + brute-force + no user-enumeration), Google OAuth kept as secondary. sessionStorage intro replay. Secret ⓘ button + Konami discovery card. Return Visitor Continuity.
-- **2026-07** — ADAM v2 conversational workspace, `adam_leads` collection, /discover, /summary, /handover.
-- **2026-07** — Blog CMS + admin panel, view analytics, mobile ADAM activation.
+- **2026-08-31 late (this run)** — **Pages CMS**: New "Pages" admin tab with 24 editable pages (Home, About, Process, Case Studies index, Blog index, Careers, Contact, all 11 services, all 5 industries, Pune). Editor with SEO title (60-char counter), meta description (160-char counter), OG image URL, canonical URL, no-index toggle, and a live SERP preview card. Public endpoint `GET /api/page-seo/{key}`. New `useSEO` hook applies overrides to `<title>` + full OG/Twitter/canonical/robots meta tags. Wired into Landing/Blog/BlogPost/ServicePage (covers 22+ of the 24 pages).
+- **2026-08-31 earlier** — robots.txt, llm.txt, dynamic /api/sitemap.xml, EM-dash cleanup across 28 files, Admin panel Overview + Enquiries + Settings tabs, Blog SEO fields.
+- **2026-08 earlier** — 13 new pages, Lead Inbox, secure /login, sessionStorage intro replay, Secret ⓘ button + Konami card, Return Visitor Continuity.
+
+## Backlog (P1)
+- **Portfolio CMS** — migrate the 5 hardcoded case studies into MongoDB with admin CRUD
+- **Media library** — image + document upload via Emergent object storage
+- **Blog category taxonomy** — replace free-text with a category collection
+- **Password Rotate** — in-dashboard password change
+- **Lead Export** — CSV export from Lead Inbox
+- **Site settings → head** — apply `default_seo_title` / `default_og_image` from Settings as global fallbacks
+
+## Site Map
+- `/` · `/about` · `/process` · `/case-studies` · `/case-studies/{slug}` · `/careers` · `/contact` · `/blog` · `/blog/{slug}`
+- **Services** — `/services/growth-marketing`, `/services/performance-marketing`, `/services/google-ads`, `/services/meta-ads`, `/services/seo`, `/services/ai-seo`, `/services/social-media-marketing`, `/services/brand-strategy`, `/services/website-development`, `/services/linkedin-marketing`, `/services/b2b-marketing`
+- **Industries** — `/industries/furniture`, `/industries/pharma`, `/industries/manufacturing`, `/industries/b2b`, `/industries/ecommerce`
+- **Locations** — `/locations/pune`
+- **Admin** — `/login`, `/adcom-admin` (Essays + Lead inbox tabs)
 
 ## Architecture
 - `/app/frontend/src/pages/Login.jsx` — internal password login (with Google as secondary)

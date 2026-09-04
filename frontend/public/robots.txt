@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+
+# Internal & backend surfaces
+Disallow: /login
+Disallow: /adcom-admin
+Disallow: /adcom-admin/
+Disallow: /api/
+
+# OAuth callback / session fragments
+Disallow: /*?session_id=
+Disallow: /*#session_id=
+
+# Sitemap
+Sitemap: https://www.adcommedia.com/api/sitemap.xml

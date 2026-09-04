@@ -201,7 +201,7 @@ function SummaryRow({ label, value, accent = false }) {
   return (
     <div>
       <div className="adam-mono text-[10px] uppercase tracking-[0.28em] text-white/45 mb-1.5">{label}</div>
-      <div className={`text-[15px] leading-[1.55] ${accent ? 'text-white font-medium' : 'text-white/90'}`}>{value || '—'}</div>
+      <div className={`text-[15px] leading-[1.55] ${accent ? 'text-white font-medium' : 'text-white/90'}`}>{value || ', '}</div>
     </div>
   );
 }
@@ -231,7 +231,7 @@ export default function AdamWorkspace({ onExit }) {
   const scrollRef = useRef(null);
   const turnCountRef = useRef(0);
 
-  // Return Visitor Continuity — check for a prior session
+  // Return Visitor Continuity, check for a prior session
   const [resumeHint, setResumeHint] = useState(null);
   const [resuming, setResuming] = useState(false);
 
@@ -240,7 +240,7 @@ export default function AdamWorkspace({ onExit }) {
     const hint = readResumeHint();
     if (hint) {
       setResumeHint(hint);
-      // Don't show opening line yet — wait for user to choose
+      // Don't show opening line yet, wait for user to choose
       setMessages([]);
     } else {
       setMessages([{ role: 'assistant', text: OPENING_LINE }]);
@@ -276,8 +276,8 @@ export default function AdamWorkspace({ onExit }) {
       const restoredMessages = (doc.transcript || []).map((t) => ({ role: t.role, text: t.text }));
       const greetName = doc.profile?.name ? doc.profile.name.split(' ')[0] : null;
       const welcome = greetName
-        ? `Welcome back, ${greetName}. Picking up right where we left off — nothing to repeat.`
-        : `Welcome back. Picking up right where we left off — nothing to repeat.`;
+        ? `Welcome back, ${greetName}. Picking up right where we left off, nothing to repeat.`
+        : `Welcome back. Picking up right where we left off, nothing to repeat.`;
       setProfile(doc.profile || {});
       setMessages([...restoredMessages, { role: 'assistant', text: welcome }]);
       if (doc.business_summary) setSummary({ business: doc.business_summary, website: doc.website_summary || null });
@@ -294,7 +294,7 @@ export default function AdamWorkspace({ onExit }) {
       }
       setResumeHint(null);
     } catch (e) {
-      // Previous session gone — start fresh
+      // Previous session gone, start fresh
       clearResumeHint();
       startFresh();
     } finally { setResuming(false); }
@@ -361,18 +361,18 @@ export default function AdamWorkspace({ onExit }) {
       const s = await apiPost('/adam/scrape', { url: target });
       setScan(s);
       setProfile((p) => ({ ...p, website: s.url }));
-      setMessages((m) => [...m, { role: 'assistant', text: `Site read. I have a picture of ${s.title || 'your brand'}. Give me a moment — putting the whole thing together.` }]);
+      setMessages((m) => [...m, { role: 'assistant', text: `Site read. I have a picture of ${s.title || 'your brand'}. Give me a moment, putting the whole thing together.` }]);
       // proceed straight to summary
       generateSummary(s);
     } catch (e) {
       setScanErr(e.message || 'Could not reach that URL');
-      setMessages((m) => [...m, { role: 'assistant', text: `I couldn't reach that URL — happens sometimes. We can continue without it.` }]);
+      setMessages((m) => [...m, { role: 'assistant', text: `I couldn't reach that URL, happens sometimes. We can continue without it.` }]);
       setPhase('offer_website');
     }
   }, [urlValue]);
 
   const skipWebsite = useCallback(() => {
-    setMessages((m) => [...m, { role: 'user', text: 'Continue without website' }, { role: 'assistant', text: `No problem. I can still give you a direction from what you've told me — one moment.` }]);
+    setMessages((m) => [...m, { role: 'user', text: 'Continue without website' }, { role: 'assistant', text: `No problem. I can still give you a direction from what you've told me, one moment.` }]);
     generateSummary(null);
   }, []);
 
@@ -424,12 +424,12 @@ export default function AdamWorkspace({ onExit }) {
     if (id === 'audit') {
       if (!scan) {
         setPhase('offer_website');
-        setMessages((m) => [...m, { role: 'assistant', text: `I'll need your website URL for the deep audit — drop it below.` }]);
+        setMessages((m) => [...m, { role: 'assistant', text: `I'll need your website URL for the deep audit, drop it below.` }]);
         return;
       }
       // continue the conversation in "audit" mode via /discover
       setPhase('discover');
-      sendTurn('Give me a deeper audit of my website — go into technical SEO, positioning, conversion.');
+      sendTurn('Give me a deeper audit of my website, go into technical SEO, positioning, conversion.');
       return;
     }
     if (id === 'chat') {
@@ -440,7 +440,7 @@ export default function AdamWorkspace({ onExit }) {
     if (id === 'talk') { setShowHandover(true); return; }
     if (id === 'done') {
       setPhase('done');
-      setMessages((m) => [...m, { role: 'assistant', text: `Great. Nothing to sign, nothing to submit — take what's useful. If anything I said resonates, you know where to find us.` }]);
+      setMessages((m) => [...m, { role: 'assistant', text: `Great. Nothing to sign, nothing to submit, take what's useful. If anything I said resonates, you know where to find us.` }]);
     }
   }, [scan, generateRoadmap, sendTurn]);
 
@@ -704,7 +704,7 @@ export default function AdamWorkspace({ onExit }) {
                     <Check size={20} className="text-[#D72638]" />
                   </div>
                   <div className="font-display text-2xl mb-2">Brief sent to the studio.</div>
-                  <div className="text-sm text-white/60">A strategist will reach out within one working day — with everything ADAM learned already in hand.</div>
+                  <div className="text-sm text-white/60">A strategist will reach out within one working day, with everything ADAM learned already in hand.</div>
                   <button onClick={() => { setShowHandover(false); setHandoverSent(false); onExit && onExit(); }} className="mt-6 px-5 py-2 rounded-full border border-white/15 text-xs uppercase tracking-widest hover:bg-white/5">Close</button>
                 </div>
               ) : (
@@ -712,7 +712,7 @@ export default function AdamWorkspace({ onExit }) {
                   <div className="adam-mono text-[10px] uppercase tracking-[0.28em] text-[#D72638] mb-2">Handover</div>
                   <div className="font-display text-2xl md:text-3xl tracking-tight mb-4">Bring in the humans.</div>
                   <p className="text-sm text-white/60 leading-relaxed mb-5">
-                    I&apos;ll pass everything you&apos;ve shared — the business context, the summary and the roadmap if we built one — to a strategist at ADCOM. No pitch deck, no dead form.
+                    I&apos;ll pass everything you&apos;ve shared, the business context, the summary and the roadmap if we built one, to a strategist at ADCOM. No pitch deck, no dead form.
                   </p>
                   <div className="space-y-3">
                     {!profile.name && (

@@ -9,8 +9,10 @@ import { BlogEnquiry } from '@/components/enquiries';
 import FAQ from '@/components/FAQ';
 import CustomCursor from '@/components/CustomCursor';
 import { apiGet } from '@/lib/api';
+import useSEO from '@/hooks/useSEO';
 
 export default function Blog() {
+  useSEO('blog', { title: 'Adcom Journal · essays on growth, brand and category', description: 'Long-form essays on growth, brand, AI SEO and category building from the Adcom Media studio.' });
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {

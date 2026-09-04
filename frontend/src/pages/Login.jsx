@@ -21,6 +21,11 @@ export default function Login() {
   const [status, setStatus] = useState(STATES.IDLE);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    document.body.classList.add('native-cursor');
+    return () => document.body.classList.remove('native-cursor');
+  }, []);
+
   // If already signed in, bounce to admin
   useEffect(() => {
     apiGet('/auth/me').then(() => navigate('/adcom-admin', { replace: true })).catch(() => {});
