@@ -16,9 +16,17 @@ Build a world-class, premium digital marketing agency website for **Adcom Media*
 - Blog posts migrated to MongoDB with view counters + popular-post analytics dashboard
 
 ## Recent Changes
-- **2026-08 (this run)** — **13 new pages added** using the existing `ServicePage` template: 7 new services (`Google Ads`, `Meta Ads`, `SEO`, `Social Media Marketing`, `Website Development`, `LinkedIn Marketing`, `B2B Marketing`), 5 industries (`Furniture`, `Pharma`, `Manufacturing`, `B2B`, `E-commerce`), and 1 location page (`Pune`). Header menu overlay rebuilt with three grouped sections (Services / Industries / Locations) linking to all pages. Case-study cross-linking distributed by topical fit.
-- **2026-08 earlier** — Lead Inbox in `/adcom-admin` (list, filter, search, detail modal, one-click Convert). Secure `/login` with bcrypt + Google OAuth secondary. Intro replay via sessionStorage. Secret ⓘ button + Konami card. Return Visitor Continuity.
-- **2026-07** — ADAM v2 conversational workspace, `adam_leads` collection, /discover, /summary, /handover.
+- **2026-08-31 late (this run)** — **Pages CMS**: New "Pages" admin tab with 24 editable pages (Home, About, Process, Case Studies index, Blog index, Careers, Contact, all 11 services, all 5 industries, Pune). Editor with SEO title (60-char counter), meta description (160-char counter), OG image URL, canonical URL, no-index toggle, and a live SERP preview card. Public endpoint `GET /api/page-seo/{key}`. New `useSEO` hook applies overrides to `<title>` + full OG/Twitter/canonical/robots meta tags. Wired into Landing/Blog/BlogPost/ServicePage (covers 22+ of the 24 pages).
+- **2026-08-31 earlier** — robots.txt, llm.txt, dynamic /api/sitemap.xml, EM-dash cleanup across 28 files, Admin panel Overview + Enquiries + Settings tabs, Blog SEO fields.
+- **2026-08 earlier** — 13 new pages, Lead Inbox, secure /login, sessionStorage intro replay, Secret ⓘ button + Konami card, Return Visitor Continuity.
+
+## Backlog (P1)
+- **Portfolio CMS** — migrate the 5 hardcoded case studies into MongoDB with admin CRUD
+- **Media library** — image + document upload via Emergent object storage
+- **Blog category taxonomy** — replace free-text with a category collection
+- **Password Rotate** — in-dashboard password change
+- **Lead Export** — CSV export from Lead Inbox
+- **Site settings → head** — apply `default_seo_title` / `default_og_image` from Settings as global fallbacks
 
 ## Site Map
 - `/` · `/about` · `/process` · `/case-studies` · `/case-studies/{slug}` · `/careers` · `/contact` · `/blog` · `/blog/{slug}`

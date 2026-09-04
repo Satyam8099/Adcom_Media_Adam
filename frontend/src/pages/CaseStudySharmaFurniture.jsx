@@ -38,7 +38,7 @@ const fadeUp = {
   }),
 };
 
-/* ----------------- 01 — Hero ----------------- */
+/* ----------------- 01, Hero ----------------- */
 
 function Hero() {
   const ref = useRef(null);
@@ -125,14 +125,14 @@ function Hero() {
   );
 }
 
-/* ----------------- 02 — Reality / Split ----------------- */
+/* ----------------- 02, Reality / Split ----------------- */
 
 function FurnitureRarely() {
   return (
     <section id="journey" className="relative py-24 md:py-32 lg:py-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-          {/* Left — image stack */}
+          {/* Left, image stack */}
           <motion.div
             initial="hidden" whileInView="show" viewport={{ once: true, margin: '-100px' }}
             variants={fadeUp} className="lg:col-span-6 relative"
@@ -146,7 +146,7 @@ function FurnitureRarely() {
             </div>
           </motion.div>
 
-          {/* Right — copy */}
+          {/* Right, copy */}
           <motion.div
             initial="hidden" whileInView="show" viewport={{ once: true, margin: '-100px' }}
             variants={fadeUp} custom={1} className="lg:col-span-6"
@@ -175,7 +175,7 @@ function FurnitureRarely() {
   );
 }
 
-/* ----------------- 03 — Decision-making cards ----------------- */
+/* ----------------- 03, Decision-making cards ----------------- */
 
 const decisionCards = [
   { n: '01', t: 'Search Visibility', Icon: Search, d: 'Making Sharma Furnituree discoverable when customers were actively researching furniture.' },
@@ -248,7 +248,7 @@ function DecisionMaking() {
   );
 }
 
-/* ----------------- 04 — KPIs ----------------- */
+/* ----------------- 04, KPIs ----------------- */
 
 function CountUp({ to, suffix = '', prefix = '', delay = 0 }) {
   const ref = useRef(null);
@@ -326,13 +326,13 @@ function SmallImprovements() {
   );
 }
 
-/* ----------------- 05 — Trust leakage process ----------------- */
+/* ----------------- 05, Trust leakage process ----------------- */
 
 const trustItems = [
-  { t: 'Product discovery', d: 'Re-architected the catalog so customers could explore by room, by use, by budget — not just by category.' },
+  { t: 'Product discovery', d: 'Re-architected the catalog so customers could explore by room, by use, by budget, not just by category.' },
   { t: 'Mobile experience', d: 'Rebuilt the mobile journey with thumb-first navigation and instant-loading product galleries.' },
   { t: 'Trust signals', d: 'Real customer photos, verified reviews and decade-old craftsmanship stories placed where buyers hesitate.' },
-  { t: 'Simplified enquiries', d: 'Pre-filled enquiry flows by product, by room and by EMI option — fewer fields, more starts.' },
+  { t: 'Simplified enquiries', d: 'Pre-filled enquiry flows by product, by room and by EMI option, fewer fields, more starts.' },
   { t: 'WhatsApp accessibility', d: 'One-tap WhatsApp on every product card, with a real human (not a chatbot) on the other end.' },
   { t: 'Clearer navigation', d: 'Restructured menu, search and breadcrumbs around how customers actually think about furniture.' },
 ];
@@ -391,7 +391,7 @@ function TrustLeakage() {
   );
 }
 
-/* ----------------- 06 — Real homes / image scroller ----------------- */
+/* ----------------- 06, Real homes / image scroller ----------------- */
 
 const homes = [
   { img: SHOWROOM_2, room: 'Living', tag: 'Mr. Singh · Sonari' },
@@ -455,7 +455,7 @@ function RealHomes() {
   );
 }
 
-/* ----------------- 07 — Growth system timeline ----------------- */
+/* ----------------- 07, Growth system timeline ----------------- */
 
 const timeline = [
   { t: 'Search discovery', d: 'Found when the buyer was looking.' },
@@ -513,7 +513,7 @@ function GrowthSystem() {
   );
 }
 
-/* ----------------- 08 — Customer journey ----------------- */
+/* ----------------- 08, Customer journey ----------------- */
 
 const journey = [
   { Icon: Search, t: 'Discovers the brand online', d: 'Through search, maps and trusted local content.' },
@@ -568,7 +568,7 @@ function CustomerJourney() {
   );
 }
 
-/* ----------------- 09 — Founder spotlight ----------------- */
+/* ----------------- 09, Founder spotlight ----------------- */
 
 function FounderSpotlight() {
   return (
@@ -631,7 +631,7 @@ function FounderSpotlight() {
   );
 }
 
-/* ----------------- 10 — Final outcome ----------------- */
+/* ----------------- 10, Final outcome ----------------- */
 
 function FinalOutcome() {
   return (

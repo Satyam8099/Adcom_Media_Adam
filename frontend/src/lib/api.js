@@ -40,6 +40,17 @@ export async function apiPatch(path, body) {
   return res.json();
 }
 
+export async function apiPut(path, body) {
+  const res = await fetch(`${API_URL}${path}`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error((await res.text()) || `PUT ${path} failed`);
+  return res.json();
+}
+
 export async function apiDelete(path) {
   const res = await fetch(`${API_URL}${path}`, {
     method: 'DELETE',

@@ -49,7 +49,7 @@ const data = {
       { t: 'Corporate website', d: 'Fast, credible, procurement-friendly. Built to convert enquiries, not to win awards.' },
       { t: 'Company profile &amp; brochures', d: 'Editorial-grade documents that do the closing work between meetings.' },
       { t: 'Print marketing', d: 'Campaign print, exhibition collateral and product literature to a single standard.' },
-      { t: 'Corporate stationery', d: 'Letterheads, decks, signage, kits — the details a plant head silently notices.' },
+      { t: 'Corporate stationery', d: 'Letterheads, decks, signage, kits, the details a plant head silently notices.' },
     ],
   },
   journey: {

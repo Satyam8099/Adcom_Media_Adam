@@ -8,7 +8,7 @@ import FAQ from '@/components/FAQ';
 import CustomCursor from '@/components/CustomCursor';
 
 /**
- * Non-form contact info strip — sits below the primary enquiry form.
+ * Non-form contact info strip, sits below the primary enquiry form.
  * Provides email, hours, WhatsApp and LinkedIn without introducing a second form.
  */
 function ContactInfoStrip() {

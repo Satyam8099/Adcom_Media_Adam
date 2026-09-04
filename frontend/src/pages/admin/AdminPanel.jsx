@@ -10,6 +10,11 @@ export default function AdminPanel() {
   const [user, setUser] = useState(location.state?.user || null);
 
   useEffect(() => {
+    document.body.classList.add('native-cursor');
+    return () => document.body.classList.remove('native-cursor');
+  }, []);
+
+  useEffect(() => {
     if (location.state?.user) return;
     (async () => {
       try {

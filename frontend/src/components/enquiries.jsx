@@ -40,7 +40,7 @@ export const ServiceEnquiry = ({ service }) => (
     id="service-enquiry"
     kicker={`Engage · ${service}`}
     headline={<>Get a strategy for<br /><span className="text-[#F43F5E]">{service}.</span></>}
-    description="Share your current state — we'll come back with a diagnostic and a proposed engagement shape."
+    description="Share your current state, we'll come back with a diagnostic and a proposed engagement shape."
     cta="Get My Strategy"
     source={`service-${service.toLowerCase().replace(/\s+/g, '-')}`}
     fields={[

@@ -24,7 +24,7 @@ const data = {
       { t: 'Google Ads',          d: 'Search restructured by tyre-spec taxonomy. High-intent, high-margin queries only.' },
       { t: 'Google Shopping',     d: 'Feed cleaned, structured and optimised for AU tyre-size search behaviour.' },
       { t: 'Performance Ops',     d: 'Weekly experimentation, disciplined budget allocation, monthly business review.' },
-      { t: 'CRO',                 d: 'Product pages, cart, checkout — every step in the funnel rebuilt for conversion.' },
+      { t: 'CRO',                 d: 'Product pages, cart, checkout, every step in the funnel rebuilt for conversion.' },
       { t: 'Analytics',           d: 'Attribution model your team can trust. No dashboard theatre.' },
     ],
   },
@@ -46,10 +46,10 @@ const data = {
     items: [
       { t: 'Meta prospecting & retargeting', d: 'Concept-led creative, weekly rotation, incrementality-tested audiences.' },
       { t: 'Google Search restructure', d: 'Taxonomy rebuilt around tyre-size intent. Wasted spend eliminated.' },
-      { t: 'Google Shopping feed', d: 'Titles, attributes, GTINs — every field engineered for match quality.' },
+      { t: 'Google Shopping feed', d: 'Titles, attributes, GTINs, every field engineered for match quality.' },
       { t: 'Landing &amp; funnel CRO', d: 'PDPs, cart flow and checkout rebuilt for AU mobile behaviour.' },
       { t: 'Attribution model', d: 'A measurement layer the founder actually reads before Monday.' },
-      { t: 'Weekly experiments', d: 'Creative, audience, offer, funnel — one test lens applied every week for a year.' },
+      { t: 'Weekly experiments', d: 'Creative, audience, offer, funnel, one test lens applied every week for a year.' },
     ],
   },
   journey: {

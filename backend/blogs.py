@@ -34,9 +34,13 @@ class BlogPost(BaseModel):
     date: str  # display date
     cover: str
     author: Author
-    body: List[str]  # array of paragraphs / ## headings / **bold** markdown-lite
+    body: List[str]
     views: int = 0
     published: bool = True
+    # SEO
+    seo_title: Optional[str] = None
+    meta_description: Optional[str] = None
+    og_image: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -52,6 +56,9 @@ class BlogCreate(BaseModel):
     body: List[str] = Field(default_factory=list)
     published: bool = True
     slug: Optional[str] = None
+    seo_title: Optional[str] = None
+    meta_description: Optional[str] = None
+    og_image: Optional[str] = None
 
 
 class BlogUpdate(BaseModel):
@@ -64,6 +71,9 @@ class BlogUpdate(BaseModel):
     author: Optional[Author] = None
     body: Optional[List[str]] = None
     published: Optional[bool] = None
+    seo_title: Optional[str] = None
+    meta_description: Optional[str] = None
+    og_image: Optional[str] = None
 
 
 SEED_POSTS = [

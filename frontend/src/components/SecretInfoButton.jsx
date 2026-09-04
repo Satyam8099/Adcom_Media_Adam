@@ -12,7 +12,7 @@ const KONAMI_ROWS = [
 ];
 
 /** Small floating hint that appears after ~60s on desktop only. Opens a discreet card
- *  with the Konami code. Does NOT cover the site — non-modal, click-outside closes. */
+ *  with the Konami code. Does NOT cover the site, non-modal, click-outside closes. */
 export default function SecretInfoButton() {
   const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);

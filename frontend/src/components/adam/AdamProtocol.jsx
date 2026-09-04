@@ -12,7 +12,7 @@ import AdamNarrative from './AdamNarrative';
 import AdamWorkspace from './AdamWorkspace';
 
 const STORAGE_KEY = 'adcom_adam_unlocked';
-const SESSION_INTRO_KEY = 'adam_intro_count'; // sessionStorage — resets per tab
+const SESSION_INTRO_KEY = 'adam_intro_count'; // sessionStorage, resets per tab
 
 function readIntroCount() {
   try { return parseInt(window.sessionStorage.getItem(SESSION_INTRO_KEY) || '0', 10) || 0; }
@@ -33,7 +33,7 @@ const FINALE = [
   { t: 'If you found this,' },
   { t: "you're probably the kind of client we enjoy working with." },
   { t: "Let's build something remarkable.", accent: true },
-  { t: '— Team ADCOM', muted: true },
+  { t: ',  Team ADCOM', muted: true },
 ];
 
 export default function AdamProtocol() {
@@ -58,7 +58,7 @@ export default function AdamProtocol() {
     document.body.classList.remove('adam-nocursor');
   }, []);
 
-  // deliberate exit via a button — say a soft farewell first
+  // deliberate exit via a button, say a soft farewell first
   const closeWithFarewell = useCallback(() => {
     adamAudio.say('Until next time.');
     setTimeout(() => close(), 1600);
@@ -173,7 +173,7 @@ export default function AdamProtocol() {
         >
           <AdamBackground />
 
-          {/* mute / unmute toggle — hidden in explore (workspace has its own controls) */}
+          {/* mute / unmute toggle, hidden in explore (workspace has its own controls) */}
           {phase !== 'explore' && (
           <button
             onClick={toggleMute}
@@ -185,7 +185,7 @@ export default function AdamProtocol() {
           </button>
           )}
 
-          {/* Skip Intro — only shown on 2nd session activation, during intro phases */}
+          {/* Skip Intro, only shown on 2nd session activation, during intro phases */}
           {phase !== 'explore' && readIntroCount() === 2 && (
             <motion.button
               initial={{ opacity: 0, y: -6 }}
@@ -217,7 +217,7 @@ export default function AdamProtocol() {
             <AdamWorkspace onExit={closeWithFarewell} />
           )}
 
-          {/* explore mode: workspace provides its own controls — no duplicate top-right nav */}
+          {/* explore mode: workspace provides its own controls, no duplicate top-right nav */}
 
           {/* persistent ESC hint */}
           {phase === 'dashboard' && (

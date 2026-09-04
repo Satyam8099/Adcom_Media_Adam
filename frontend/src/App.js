@@ -29,6 +29,7 @@ import SocialMediaMarketing from '@/pages/SocialMediaMarketing';
 import WebsiteDevelopment from '@/pages/WebsiteDevelopment';
 import LinkedInMarketing from '@/pages/LinkedInMarketing';
 import B2BMarketing from '@/pages/B2BMarketing';
+import Industrial3D from '@/pages/Industrial3D';
 import IndustryFurniture from '@/pages/IndustryFurniture';
 import IndustryPharma from '@/pages/IndustryPharma';
 import IndustryManufacturing from '@/pages/IndustryManufacturing';
@@ -50,8 +51,10 @@ import CaseStudySkylarr from '@/pages/CaseStudySkylarr';
 import AdminPanel from '@/pages/admin/AdminPanel';
 import AdminAuthCallback from '@/pages/admin/AdminAuthCallback';
 import Login from '@/pages/Login';
+import useSEO from '@/hooks/useSEO';
 
 function Landing() {
+  useSEO('home', { title: 'Adcom Media · Growth studio in Pune', description: 'Boutique growth studio for brand, growth, performance and AI SEO.' });
   return (
     <div className="App noise relative">
       <CustomCursor />
@@ -99,6 +102,7 @@ function AppRouter() {
         <Route path="/services/website-development" element={<WebsiteDevelopment />} />
         <Route path="/services/linkedin-marketing" element={<LinkedInMarketing />} />
         <Route path="/services/b2b-marketing" element={<B2BMarketing />} />
+        <Route path="/services/industrial-3d" element={<Industrial3D />} />
         <Route path="/industries/furniture" element={<IndustryFurniture />} />
         <Route path="/industries/pharma" element={<IndustryPharma />} />
         <Route path="/industries/manufacturing" element={<IndustryManufacturing />} />

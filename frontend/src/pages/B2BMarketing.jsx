@@ -13,8 +13,8 @@ const data = {
     ],
     sub: (
       <>
-        Category-defining B2B marketing — positioning, category strategy, ABM, demand generation,
-        thought leadership — for teams selling into buying committees, not shopping carts.
+        Category-defining B2B marketing, positioning, category strategy, ABM, demand generation,
+        thought leadership, for teams selling into buying committees, not shopping carts.
       </>
     ),
   },
@@ -22,18 +22,18 @@ const data = {
     headline:
       'Most B2B marketing is <span class="text-white/40">demand harvesting</span><br />pretending to be <span class="text-[#F43F5E]">demand creation.</span>',
     body:
-      'Retargeting people who were already going to buy is not marketing — it\'s tracking. Real B2B marketing changes what the buyer believes before the RFP is even written. That\'s the game we operate in.',
+      'Retargeting people who were already going to buy is not marketing, it\'s tracking. Real B2B marketing changes what the buyer believes before the RFP is even written. That\'s the game we operate in.',
   },
   pillars: {
     kicker: 'How we operate',
     title: 'Six disciplines.<br /><span class="text-white/40">One demand engine.</span>',
-    subtitle: 'A senior B2B strategist owns the account — no junior playbook clones.',
+    subtitle: 'A senior B2B strategist owns the account, no junior playbook clones.',
     pillars: [
       { title: 'Category Design', desc: 'Position the company as a category, not a feature. The most defensible moat there is.', Icon: Compass },
-      { title: 'ICP & Segmentation', desc: 'Sharp Ideal Customer Profile work — job titles, buying triggers, disqualification rules.', Icon: Building2 },
+      { title: 'ICP & Segmentation', desc: 'Sharp Ideal Customer Profile work, job titles, buying triggers, disqualification rules.', Icon: Building2 },
       { title: 'Demand Creation', desc: 'Thought leadership, editorial content, POV pieces that shape buyer belief months before the RFP.', Icon: TrendingUp },
-      { title: 'Demand Capture', desc: 'Search, LinkedIn, review sites, comparison pages — the surfaces buyers hit during evaluation.', Icon: LineChart },
-      { title: 'ABM Programs', desc: 'Named-account programs with real personalisation — not fake, orchestrated with sales.', Icon: Users },
+      { title: 'Demand Capture', desc: 'Search, LinkedIn, review sites, comparison pages, the surfaces buyers hit during evaluation.', Icon: LineChart },
+      { title: 'ABM Programs', desc: 'Named-account programs with real personalisation, not fake, orchestrated with sales.', Icon: Users },
       { title: 'Sales Enablement', desc: 'Content, decks, one-pagers and playbooks that make your best AE\'s work replicable.', Icon: MessagesSquare },
     ],
   },
@@ -49,11 +49,11 @@ const data = {
   framework: {
     kicker: 'The Adcom Method · B2B',
     title: 'A four-phase<br /><span class="text-white/40">B2B system.</span>',
-    subtitle: 'Every B2B engagement runs through the same discipline — no consumer-playbook retrofits.',
+    subtitle: 'Every B2B engagement runs through the same discipline, no consumer-playbook retrofits.',
     phases: [
       { n: '01', tag: 'Phase 01', title: 'Diagnose', desc: 'ICP work, category listening, category-map audit, sales interviews. The truth from both sides of the pipeline.' },
       { n: '02', tag: 'Phase 02', title: 'Position', desc: 'Category thesis, ICP refinement, messaging architecture, category one-pager. The single source of truth.' },
-      { n: '03', tag: 'Phase 03', title: 'Publish & Program', desc: 'Editorial demand engine + named-account ABM + sales enablement — running in parallel from day one.' },
+      { n: '03', tag: 'Phase 03', title: 'Publish & Program', desc: 'Editorial demand engine + named-account ABM + sales enablement, running in parallel from day one.' },
       { n: '04', tag: 'Phase 04', title: 'Compound', desc: 'Monthly pipeline reviews with sales, quarterly category updates, ongoing category-defining publishing.' },
     ],
   },
@@ -67,7 +67,7 @@ const data = {
     ],
   },
   testimonial: { quote: 'Adcom made us stop calling ourselves a vendor and start acting like a category. Two years later, we don\'t compete on price anymore.', name: 'Manish Bhalla', role: 'Founder, B2B SaaS', avatar: 'https://i.pravatar.cc/120?img=52' },
-  closing: { headlineHtml: 'B2B doesn\'t reward <span class="text-white/40">volume.</span><br /><span class="text-[#F43F5E]">It rewards belief.</span>', body: 'We open a small number of B2B engagements each quarter — for teams selling into buying committees who want to change what those committees believe.' },
+  closing: { headlineHtml: 'B2B doesn\'t reward <span class="text-white/40">volume.</span><br /><span class="text-[#F43F5E]">It rewards belief.</span>', body: 'We open a small number of B2B engagements each quarter, for teams selling into buying committees who want to change what those committees believe.' },
 };
 
 export default function B2BMarketing() { return <ServicePage data={data} />; }

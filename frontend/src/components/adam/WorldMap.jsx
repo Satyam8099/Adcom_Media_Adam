@@ -16,7 +16,7 @@ function arc(a, b) {
 }
 
 /**
- * Abstract "global operations" network map. Not a literal map —
+ * Abstract "global operations" network map. Not a literal map , 
  * faint graticule + a connection network radiating from the India hub.
  */
 export default function WorldMap() {
