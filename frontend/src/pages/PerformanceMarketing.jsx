@@ -19,6 +19,7 @@ import { ServiceEnquiry } from '@/components/enquiries';
 import FAQ from '@/components/FAQ';
 import CustomCursor from '@/components/CustomCursor';
 import MagneticButton from '@/components/MagneticButton';
+import useSEO from '@/hooks/useSEO';
 
 /* ------------------------------------------------------------------ */
 /*  Reusable bits                                                     */
@@ -663,6 +664,7 @@ function Closing() {
 /* ------------------------------------------------------------------ */
 
 export default function PerformanceMarketing() {
+  useSEO('services-performance-marketing');
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
