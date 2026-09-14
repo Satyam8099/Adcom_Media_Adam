@@ -1,12 +1,20 @@
 import { useEffect } from 'react';
 import { apiGet } from '@/lib/api';
+import { PAGE_SEO_DEFAULTS } from '@/lib/seoPages';
 
 /** Apply SEO overrides from the CMS to the document head.
- *  Usage: `useSEO('home')` inside any page component. Falls back to no-op if not set. */
+ *  Usage: `useSEO('home')` inside any page component.
+ *  Priority: CMS → explicit fallback → PAGE_SEO_DEFAULTS. */
 export default function useSEO(pageKey, fallback = {}) {
   useEffect(() => {
     if (!pageKey) return undefined;
     let alive = true;
+
+    const defaults = PAGE_SEO_DEFAULTS[pageKey] || {};
+    // CMS → curated defaults → call-site fallback
+    const fbTitle = defaults.title || fallback.title;
+    const fbDescription = defaults.description || fallback.description;
+    const fbOgImage = fallback.ogImage;
 
     const setMeta = (name, value, attr = 'name') => {
       if (value === undefined || value === null) return;
@@ -32,9 +40,9 @@ export default function useSEO(pageKey, fallback = {}) {
 
     const apply = (data) => {
       if (!alive) return;
-      const title = data.seo_title || fallback.title;
-      const desc = data.meta_description || fallback.description;
-      const og = data.og_image || fallback.ogImage;
+      const title = data.seo_title || fbTitle;
+      const desc = data.meta_description || fbDescription;
+      const og = data.og_image || fbOgImage;
       if (title) document.title = title;
       setMeta('description', desc);
       setMeta('og:title', title, 'property');

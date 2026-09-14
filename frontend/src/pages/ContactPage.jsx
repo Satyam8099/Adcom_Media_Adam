@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import { PrimaryContactEnquiry } from '@/components/enquiries';
 import FAQ from '@/components/FAQ';
 import CustomCursor from '@/components/CustomCursor';
+import useSEO from '@/hooks/useSEO';
 
 /**
  * Non-form contact info strip, sits below the primary enquiry form.
@@ -84,6 +85,7 @@ function ContactInfoStrip() {
 }
 
 export default function ContactPage() {
+  useSEO('contact');
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, []);
   return (
     <div className="App noise relative">

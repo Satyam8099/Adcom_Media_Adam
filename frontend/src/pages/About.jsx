@@ -9,6 +9,7 @@ import { AboutEnquiry } from '@/components/enquiries';
 import FAQ from '@/components/FAQ';
 import CustomCursor from '@/components/CustomCursor';
 import MagneticButton from '@/components/MagneticButton';
+import useSEO from '@/hooks/useSEO';
 
 const team = [
   { name: 'Amit Shukla', role: 'Founding Partner · Growth', img: 'https://i.pravatar.cc/300?img=12' },
@@ -27,6 +28,7 @@ const values = [
 ];
 
 export default function AboutPage() {
+  useSEO('about');
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, []);
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
