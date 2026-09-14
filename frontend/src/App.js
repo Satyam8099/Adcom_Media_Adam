@@ -54,7 +54,7 @@ import Login from '@/pages/Login';
 import useSEO from '@/hooks/useSEO';
 
 function Landing() {
-  useSEO('home', { title: 'Adcom Media · Growth studio in Pune', description: 'Boutique growth studio for brand, growth, performance and AI SEO.' });
+  useSEO('home');
   return (
     <div className="App noise relative">
       <CustomCursor />

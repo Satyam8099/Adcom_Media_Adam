@@ -8,6 +8,7 @@ import Contact from '@/components/Contact';
 import { CareersEnquiry } from '@/components/enquiries';
 import FAQ from '@/components/FAQ';
 import CustomCursor from '@/components/CustomCursor';
+import useSEO from '@/hooks/useSEO';
 
 const roles = [
   { title: 'Lead Growth Strategist', team: 'Growth', location: 'Pune', type: 'Full-time' },
@@ -25,6 +26,7 @@ const principles = [
 ];
 
 export default function Careers() {
+  useSEO('careers');
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, []);
   return (
     <div className="App noise relative">

@@ -5,6 +5,8 @@ from typing import Optional, Dict, Any, List
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
+from page_seo_defaults import PAGE_SEO_DEFAULTS
+
 
 class SiteSettings(BaseModel):
     company_name: Optional[str] = None
@@ -132,8 +134,10 @@ def build_admin_extras_router(db, require_admin) -> APIRouter:
         return [
             {
                 **p,
-                "seo_title": (stored.get(p["key"]) or {}).get("seo_title"),
-                "meta_description": (stored.get(p["key"]) or {}).get("meta_description"),
+                "seo_title": (stored.get(p["key"]) or {}).get("seo_title")
+                or (PAGE_SEO_DEFAULTS.get(p["key"]) or {}).get("seo_title"),
+                "meta_description": (stored.get(p["key"]) or {}).get("meta_description")
+                or (PAGE_SEO_DEFAULTS.get(p["key"]) or {}).get("meta_description"),
                 "og_image": (stored.get(p["key"]) or {}).get("og_image"),
                 "canonical": (stored.get(p["key"]) or {}).get("canonical"),
                 "no_index": (stored.get(p["key"]) or {}).get("no_index", False),
@@ -141,6 +145,13 @@ def build_admin_extras_router(db, require_admin) -> APIRouter:
             }
             for p in PAGE_CATALOG
         ]
+
+    @router.post("/pages/apply-defaults")
+    async def apply_page_seo_defaults(user=Depends(require_admin)):
+        """Write curated titles/descriptions into page_seo so they show in CMS and on the site."""
+        from page_seo_defaults import seed_page_seo
+        count = await seed_page_seo(db)
+        return {"ok": True, "applied": count}
 
     @router.put("/pages/{key}")
     async def upsert_page_seo(key: str, payload: PageSEO, user=Depends(require_admin)):
@@ -162,7 +173,11 @@ def build_public_seo_router(db) -> APIRouter:
 
     @router.get("/page-seo/{key}")
     async def get_page_seo(key: str):
-        doc = await db.page_seo.find_one({"key": key}, {"_id": 0})
-        return doc or {}
+        doc = await db.page_seo.find_one({"key": key}, {"_id": 0}) or {}
+        defaults = PAGE_SEO_DEFAULTS.get(key) or {}
+        return {
+            **defaults,
+            **{k: v for k, v in doc.items() if v not in (None, "")},
+        }
 
     return router

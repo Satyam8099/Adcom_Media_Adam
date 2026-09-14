@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, ExternalLink, Check, Loader2, X, Globe } from 'lucide-react';
-import { apiGet, apiPut } from '@/lib/api';
+import { apiGet, apiPut, apiPost } from '@/lib/api';
+import { PAGE_SEO_DEFAULTS } from '@/lib/seoPages';
 
 function Field({ label, hint, children }) {
   return (
@@ -18,9 +19,10 @@ function Field({ label, hint, children }) {
 const inp = 'w-full px-4 py-3 rounded-xl bg-black border border-white/10 focus:border-[#F43F5E] outline-none text-white placeholder:text-white/30 text-sm';
 
 function PageEditor({ page, onClose, onSaved }) {
+  const defaults = PAGE_SEO_DEFAULTS[page.key] || {};
   const [form, setForm] = useState({
-    seo_title: page.seo_title || '',
-    meta_description: page.meta_description || '',
+    seo_title: page.seo_title || defaults.title || '',
+    meta_description: page.meta_description || defaults.description || '',
     og_image: page.og_image || '',
     canonical: page.canonical || '',
     no_index: !!page.no_index,
@@ -100,14 +102,29 @@ function PageEditor({ page, onClose, onSaved }) {
 export default function PagesCMS() {
   const [pages, setPages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [applying, setApplying] = useState(false);
   const [q, setQ] = useState('');
   const [editing, setEditing] = useState(null);
+  const [applyMsg, setApplyMsg] = useState('');
 
   const refresh = async () => {
     setLoading(true);
     try { setPages(await apiGet('/admin/pages')); } finally { setLoading(false); }
   };
   useEffect(() => { refresh(); }, []);
+
+  const applyCurated = async () => {
+    setApplying(true); setApplyMsg('');
+    try {
+      const res = await apiPost('/admin/pages/apply-defaults', {});
+      setApplyMsg(`Applied SEO to ${res.applied || 0} pages.`);
+      await refresh();
+    } catch (e) {
+      setApplyMsg(e.message || 'Failed to apply SEO defaults');
+    } finally {
+      setApplying(false);
+    }
+  };
 
   const filtered = pages.filter((p) =>
     !q.trim() ? true : (p.label + ' ' + p.path).toLowerCase().includes(q.trim().toLowerCase()));
@@ -119,12 +136,22 @@ export default function PagesCMS() {
         <h1 className="font-display text-5xl md:text-6xl tracking-tighter leading-[0.95]">Every page.<br /><span className="text-white/40">Every meta tag.</span></h1>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <div className="relative flex-1 max-w-md">
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter pages…" data-testid="page-seo-search"
             className="w-full pl-11 pr-4 py-3 rounded-xl bg-black border border-white/10 focus:border-[#F43F5E] outline-none text-sm placeholder:text-white/30" />
           <Search size={15} className="absolute top-1/2 -translate-y-1/2 left-4 text-white/40" />
         </div>
+        <button
+          onClick={applyCurated}
+          disabled={applying}
+          data-testid="page-seo-apply-defaults"
+          className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[#E11D2E] text-white text-sm font-semibold hover:bg-[#ff2f45] disabled:opacity-40"
+        >
+          {applying ? <Loader2 size={14} className="animate-spin" /> : null}
+          {applying ? 'Applying…' : 'Apply curated SEO'}
+        </button>
+        {applyMsg && <div className="text-xs text-white/50">{applyMsg}</div>}
       </div>
 
       <div className="rounded-3xl border border-white/10 bg-white/[0.02] overflow-hidden">
@@ -134,10 +161,13 @@ export default function PagesCMS() {
         </div>
         <ul className="divide-y divide-white/[0.06]">
           {filtered.map((p) => {
-            const hasSEO = !!(p.seo_title || p.meta_description || p.og_image);
+            const defaults = PAGE_SEO_DEFAULTS[p.key] || {};
+            const title = p.seo_title || defaults.title;
+            const desc = p.meta_description || defaults.description;
+            const hasSEO = !!(title || desc || p.og_image);
             return (
               <li key={p.key} data-testid={`page-row-${p.key}`}
-                onClick={() => setEditing(p)}
+                onClick={() => setEditing({ ...p, seo_title: title, meta_description: desc })}
                 className="p-5 md:p-6 hover:bg-white/[0.02] cursor-pointer transition-colors flex items-start gap-4">
                 <div className="w-11 h-11 rounded-full border border-white/10 bg-white/[0.03] flex items-center justify-center shrink-0">
                   <Globe size={15} className="text-white/60" />
@@ -153,7 +183,7 @@ export default function PagesCMS() {
                     <span className="adam-mono text-[10px] text-white/40">{p.path}</span>
                   </div>
                   <div className="font-display text-lg md:text-xl tracking-tight truncate">{p.label}</div>
-                  {p.seo_title && <div className="text-xs text-white/50 mt-1 truncate">Title: {p.seo_title}</div>}
+                  {title && <div className="text-xs text-white/50 mt-1 truncate">Title: {title}</div>}
                 </div>
                 <div className="adam-mono text-[10px] uppercase tracking-[0.22em] text-white/50 hover:text-white flex items-center gap-1 shrink-0 self-center">
                   Edit SEO →

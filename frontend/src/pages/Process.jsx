@@ -8,6 +8,7 @@ import Contact from '@/components/Contact';
 import { ProcessEnquiry } from '@/components/enquiries';
 import FAQ from '@/components/FAQ';
 import CustomCursor from '@/components/CustomCursor';
+import useSEO from '@/hooks/useSEO';
 
 const phases = [
   {
@@ -66,6 +67,7 @@ function Row({ s, i }) {
 }
 
 export default function ProcessPage() {
+  useSEO('process');
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, []);
   return (
     <div className="App noise relative">
