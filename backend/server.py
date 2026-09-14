@@ -15,6 +15,7 @@ from datetime import datetime, timezone
 
 from auth import build_auth_router, seed_admin
 from blogs import build_blog_router, seed_blogs_if_empty
+from page_seo_defaults import seed_page_seo
 from adam_intel import build_adam_router
 from adam_leads import build_adam_leads_router
 from admin_extras import build_admin_extras_router, build_public_seo_router
@@ -292,6 +293,10 @@ async def on_startup():
         await seed_admin(db)
     except Exception:
         logger.exception("Admin seeding failed")
+    try:
+        await seed_page_seo(db)
+    except Exception:
+        logger.exception("Page SEO seeding failed")
     try:
         await db.users.create_index("email", unique=True)
         await db.login_attempts.create_index([("identifier", 1), ("ts", -1)])
