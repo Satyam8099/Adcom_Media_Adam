@@ -19,9 +19,13 @@ BRUTE_FORCE_MAX = 5
 BRUTE_FORCE_WINDOW_MIN = 15
 OAUTH_STATE_TTL_SEC = 600
 
-GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
+GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/auth"
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
+
+# Production defaults aligned with Google Cloud OAuth client (sanguine-method-296218)
+DEFAULT_FRONTEND_URL = "https://adcommedia.in"
+DEFAULT_GOOGLE_REDIRECT_URI = "https://api.adcommedia.in/api/auth/google/callback"
 
 
 def _admin_allowlist() -> set:
@@ -30,7 +34,11 @@ def _admin_allowlist() -> set:
 
 
 def _frontend_url() -> str:
-    return (os.environ.get("PUBLIC_SITE_URL") or os.environ.get("FRONTEND_URL") or "").rstrip("/")
+    return (
+        os.environ.get("PUBLIC_SITE_URL")
+        or os.environ.get("FRONTEND_URL")
+        or DEFAULT_FRONTEND_URL
+    ).rstrip("/")
 
 
 def _google_client_id() -> str:
@@ -41,11 +49,11 @@ def _google_client_secret() -> str:
     return (os.environ.get("GOOGLE_CLIENT_SECRET") or "").strip()
 
 
-def _google_redirect_uri(request: Request) -> str:
+def _google_redirect_uri() -> str:
     explicit = (os.environ.get("GOOGLE_REDIRECT_URI") or "").strip()
     if explicit:
         return explicit
-    return str(request.base_url).rstrip("/") + "/api/auth/google/callback"
+    return DEFAULT_GOOGLE_REDIRECT_URI
 
 
 def _hash_password(password: str) -> str:
@@ -198,7 +206,7 @@ def build_auth_router(db) -> APIRouter:
         state = secrets.token_urlsafe(24)
         params = {
             "client_id": client_id,
-            "redirect_uri": _google_redirect_uri(request),
+            "redirect_uri": _google_redirect_uri(),
             "response_type": "code",
             "scope": "openid email profile",
             "access_type": "online",
@@ -240,7 +248,7 @@ def build_auth_router(db) -> APIRouter:
         if not client_id or not client_secret:
             return fail("Google OAuth is not configured")
 
-        redirect_uri = _google_redirect_uri(request)
+        redirect_uri = _google_redirect_uri()
         try:
             async with httpx.AsyncClient(timeout=20) as http:
                 token_res = await http.post(
