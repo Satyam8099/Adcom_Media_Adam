@@ -9,13 +9,15 @@ services:
       - key: PYTHON_VERSION
         value: "3.11.0"
       - key: GOOGLE_REDIRECT_URI
-        value: https://api.adcommedia.in/api/auth/google/callback
+        value: https://adcommedia.in/api/auth/google/callback
       - key: PUBLIC_SITE_URL
         value: https://adcommedia.in
       - key: FRONTEND_URL
         value: https://adcommedia.in
       - key: CORS_ORIGINS
         value: https://adcommedia.in,https://www.adcommedia.in
+      - key: COOKIE_SAMESITE
+        value: lax
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET
