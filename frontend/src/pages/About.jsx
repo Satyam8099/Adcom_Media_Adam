@@ -11,6 +11,7 @@ import CustomCursor from '@/components/CustomCursor';
 import MagneticButton from '@/components/MagneticButton';
 import useSEO from '@/hooks/useSEO';
 
+/* Team photos disabled for now
 const team = [
   { name: 'Amit Shukla', role: 'Founding Partner · Growth', img: 'https://i.pravatar.cc/300?img=12' },
   { name: 'Ishita Rao', role: 'Founding Partner · Brand', img: 'https://i.pravatar.cc/300?img=47' },
@@ -19,6 +20,7 @@ const team = [
   { name: 'Mira Joseph', role: 'Strategy Director', img: 'https://i.pravatar.cc/300?img=32' },
   { name: 'Rohan Nair', role: 'Head of AI SEO', img: 'https://i.pravatar.cc/300?img=33' },
 ];
+*/
 
 const values = [
   { t: 'Expert-led, by design.', d: 'No pods. No trainees on your account. The hands that sold the work do the work.' },
@@ -128,7 +130,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* TEAM */}
+        {/* TEAM — image section disabled
         <section className="relative py-24 md:py-32 lg:py-40">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-12">
@@ -153,6 +155,7 @@ export default function AboutPage() {
             </div>
           </div>
         </section>
+        */}
 
         {/* CTA STRIP */}
         <section className="relative py-20 md:py-28">
