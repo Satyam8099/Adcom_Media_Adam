@@ -23,7 +23,7 @@ GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/auth"
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
 
-# Production defaults aligned with Google Cloud OAuth client (sanguine-method-296218)
+# Production defaults: Vercel frontend + Render API custom domain
 DEFAULT_FRONTEND_URL = "https://adcommedia.in"
 DEFAULT_GOOGLE_REDIRECT_URI = "https://api.adcommedia.in/api/auth/google/callback"
 
@@ -67,13 +67,19 @@ def _verify_password(plain: str, hashed: str) -> bool:
         return False
 
 
+def _cookie_samesite() -> str:
+    # "lax" for same-origin Vercel /api proxy; "none" only if FE calls Render host directly
+    return (os.environ.get("COOKIE_SAMESITE") or "lax").strip().lower() or "lax"
+
+
 def _set_session_cookie(response: Response, token: str):
+    samesite = _cookie_samesite()
     response.set_cookie(
         key="session_token",
         value=token,
         httponly=True,
         secure=True,
-        samesite="none",
+        samesite=samesite,
         path="/",
         max_age=SESSION_TTL_DAYS * 24 * 60 * 60,
     )
@@ -388,7 +394,7 @@ def build_auth_router(db) -> APIRouter:
         token = request.cookies.get("session_token")
         if token:
             await db.user_sessions.delete_one({"session_token": token})
-        response.delete_cookie("session_token", path="/", samesite="none", secure=True)
+        response.delete_cookie("session_token", path="/", samesite=_cookie_samesite(), secure=True)
         return {"ok": True}
 
     @router.post("/change-password")

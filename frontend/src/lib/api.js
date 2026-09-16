@@ -1,7 +1,10 @@
 // Central API helper for Adcom Media
-const API_BASE = process.env.REACT_APP_BACKEND_URL;
+// Prefer same-origin `/api` (Vercel rewrite → Render) so session cookies are first-party.
+// Set REACT_APP_BACKEND_URL only if you must call the API host directly.
+const RAW_BASE = (process.env.REACT_APP_BACKEND_URL || '').replace(/\/$/, '');
 
-export const API_URL = `${API_BASE}/api`;
+export const API_BASE = RAW_BASE;
+export const API_URL = RAW_BASE ? `${RAW_BASE}/api` : '/api';
 
 export async function apiGet(path, opts = {}) {
   const res = await fetch(`${API_URL}${path}`, {

@@ -11,6 +11,8 @@
  * envelopes so there are never clicks/pops.
  */
 
+import { API_URL } from '@/lib/api';
+
 const MUTE_KEY = 'adcom_adam_muted';
 
 class AdamAudio {
@@ -285,8 +287,7 @@ class AdamAudio {
   async _checkVoice() {
     if (this.voiceEnabled !== null) return this.voiceEnabled;
     try {
-      const base = process.env.REACT_APP_BACKEND_URL;
-      const r = await fetch(`${base}/api/adam/voice/status`);
+      const r = await fetch(`${API_URL}/adam/voice/status`);
       const j = await r.json();
       this.voiceEnabled = !!j.enabled;
     } catch (e) {
@@ -297,8 +298,7 @@ class AdamAudio {
 
   async _fetchClip(text) {
     if (this.clipCache.has(text)) return this.clipCache.get(text);
-    const base = process.env.REACT_APP_BACKEND_URL;
-    const r = await fetch(`${base}/api/adam/voice`, {
+    const r = await fetch(`${API_URL}/adam/voice`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text }),
