@@ -263,7 +263,7 @@ async def adam_voice(req: VoiceRequest):
 
 app.include_router(api_router)
 
-# Auth (Emergent Google OAuth) + Blog CMS + ADAM Intelligence
+# Auth (Google OAuth + password) + Blog CMS + ADAM Intelligence
 _auth_router, _get_current_user, _require_admin = build_auth_router(db)
 app.include_router(_auth_router)
 app.include_router(build_blog_router(db, _require_admin))
@@ -273,12 +273,20 @@ app.include_router(_leads_router)
 app.include_router(_leads_admin_router)
 app.include_router(build_admin_extras_router(db, _require_admin))
 app.include_router(build_public_seo_router(db))
-app.include_router(build_sitemap_router(db, base_url=os.environ.get('PUBLIC_SITE_URL', 'https://adcom-vault.preview.emergentagent.com')))
+app.include_router(build_sitemap_router(db, base_url=os.environ.get('PUBLIC_SITE_URL', 'https://adcommedia.in')))
 
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    # Vercel frontend origins (override with CORS_ORIGINS on Render)
+    allow_origins=[
+        o.strip()
+        for o in os.environ.get(
+            "CORS_ORIGINS",
+            "https://adcommedia.in,https://www.adcommedia.in",
+        ).split(",")
+        if o.strip()
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
 )
