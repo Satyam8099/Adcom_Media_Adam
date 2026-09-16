@@ -50,6 +50,7 @@ import CaseStudyAusTyre from '@/pages/CaseStudyAusTyre';
 import CaseStudySkylarr from '@/pages/CaseStudySkylarr';
 import AdminPanel from '@/pages/admin/AdminPanel';
 import Login from '@/pages/Login';
+import GoogleAuthDone from '@/pages/GoogleAuthDone';
 import useSEO from '@/hooks/useSEO';
 
 function Landing() {
@@ -116,6 +117,7 @@ function AppRouter() {
         <Route path="/case-studies/skylarr" element={<CaseStudySkylarr />} />
         <Route path="/adcom-admin" element={<AdminPanel />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/auth/google/done" element={<GoogleAuthDone />} />
       </Routes>
     </>
   );
