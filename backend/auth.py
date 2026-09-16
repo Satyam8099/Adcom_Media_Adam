@@ -1,29 +1,51 @@
-"""Emergent-managed Google Auth + secure email/password login for Adcom Media admin panel.
-
-REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
-"""
+"""Google OAuth + secure email/password login for Adcom Media admin panel."""
 import os
 import logging
 import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Optional
+from urllib.parse import urlencode, quote
 
 import bcrypt
 import httpx
 from fastapi import APIRouter, HTTPException, Request, Response, Depends
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, EmailStr, Field
 
 logger = logging.getLogger(__name__)
 
-EMERGENT_SESSION_URL = "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data"
 SESSION_TTL_DAYS = 7
 BRUTE_FORCE_MAX = 5
 BRUTE_FORCE_WINDOW_MIN = 15
+OAUTH_STATE_TTL_SEC = 600
+
+GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
+GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
+GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
 
 
 def _admin_allowlist() -> set:
     raw = os.environ.get("ADMIN_ALLOWLIST", "")
     return {e.strip().lower() for e in raw.split(",") if e.strip()}
+
+
+def _frontend_url() -> str:
+    return (os.environ.get("PUBLIC_SITE_URL") or os.environ.get("FRONTEND_URL") or "").rstrip("/")
+
+
+def _google_client_id() -> str:
+    return (os.environ.get("GOOGLE_CLIENT_ID") or "").strip()
+
+
+def _google_client_secret() -> str:
+    return (os.environ.get("GOOGLE_CLIENT_SECRET") or "").strip()
+
+
+def _google_redirect_uri(request: Request) -> str:
+    explicit = (os.environ.get("GOOGLE_REDIRECT_URI") or "").strip()
+    if explicit:
+        return explicit
+    return str(request.base_url).rstrip("/") + "/api/auth/google/callback"
 
 
 def _hash_password(password: str) -> str:
@@ -37,8 +59,16 @@ def _verify_password(plain: str, hashed: str) -> bool:
         return False
 
 
-class AuthSessionRequest(BaseModel):
-    session_id: str = Field(..., min_length=8)
+def _set_session_cookie(response: Response, token: str):
+    response.set_cookie(
+        key="session_token",
+        value=token,
+        httponly=True,
+        secure=True,
+        samesite="none",
+        path="/",
+        max_age=SESSION_TTL_DAYS * 24 * 60 * 60,
+    )
 
 
 class PasswordLoginRequest(BaseModel):
@@ -93,6 +123,31 @@ async def seed_admin(db):
             logger.info("Refreshed admin password hash for %s", email)
 
 
+async def _upsert_google_user(db, email: str, name: str, picture: Optional[str]):
+    existing = await db.users.find_one({"email": email}, {"_id": 0})
+    now = datetime.now(timezone.utc)
+    role = "chief" if email == "hello.adcommedia@gmail.com" else "admin"
+    if existing:
+        user_id = existing["user_id"]
+        role = existing.get("role") or role
+        await db.users.update_one(
+            {"user_id": user_id},
+            {"$set": {"name": name, "picture": picture, "last_login": now.isoformat()}},
+        )
+    else:
+        user_id = f"user_{secrets.token_hex(6)}"
+        await db.users.insert_one({
+            "user_id": user_id,
+            "email": email,
+            "name": name,
+            "picture": picture,
+            "role": role,
+            "created_at": now.isoformat(),
+            "last_login": now.isoformat(),
+        })
+    return user_id, role, now
+
+
 def build_auth_router(db) -> APIRouter:
     router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -133,86 +188,127 @@ def build_auth_router(db) -> APIRouter:
             raise HTTPException(status_code=403, detail="Not authorized")
         return user
 
-    @router.post("/session")
-    async def exchange_session(payload: AuthSessionRequest, response: Response):
-        """Exchange the OAuth session_id (from URL fragment) for a persistent session cookie."""
-        try:
-            async with httpx.AsyncClient(timeout=15) as http:
-                r = await http.get(
-                    EMERGENT_SESSION_URL,
-                    headers={"X-Session-ID": payload.session_id},
-                )
-            if r.status_code != 200:
-                logger.warning("Emergent auth session-data failed: %s %s", r.status_code, r.text[:200])
-                raise HTTPException(status_code=401, detail="Google authentication failed")
-            data = r.json()
-        except HTTPException:
-            raise
-        except Exception:
-            logger.exception("Emergent auth exchange error")
-            raise HTTPException(status_code=502, detail="Auth service unreachable")
+    @router.get("/google/start")
+    async def google_start(request: Request):
+        """Begin Google OAuth — redirects the browser to Google consent."""
+        client_id = _google_client_id()
+        if not client_id:
+            raise HTTPException(status_code=503, detail="Google OAuth is not configured")
 
-        email = (data.get("email") or "").lower()
-        name = data.get("name") or email.split("@")[0]
+        state = secrets.token_urlsafe(24)
+        params = {
+            "client_id": client_id,
+            "redirect_uri": _google_redirect_uri(request),
+            "response_type": "code",
+            "scope": "openid email profile",
+            "access_type": "online",
+            "include_granted_scopes": "true",
+            "prompt": "select_account",
+            "state": state,
+        }
+        response = RedirectResponse(f"{GOOGLE_AUTH_URL}?{urlencode(params)}", status_code=302)
+        response.set_cookie(
+            key="oauth_state",
+            value=state,
+            httponly=True,
+            secure=True,
+            samesite="lax",
+            path="/",
+            max_age=OAUTH_STATE_TTL_SEC,
+        )
+        return response
+
+    @router.get("/google/callback")
+    async def google_callback(request: Request, code: Optional[str] = None, state: Optional[str] = None, error: Optional[str] = None):
+        """Google redirects here with ?code=… — exchange, set session cookie, send user to admin."""
+        frontend = _frontend_url() or str(request.base_url).rstrip("/")
+        def fail(msg: str):
+            return RedirectResponse(f"{frontend}/login?error={quote(msg)}", status_code=302)
+
+        if error:
+            logger.warning("Google OAuth error: %s", error)
+            return fail("Google sign-in was cancelled or failed")
+        if not code or not state:
+            return fail("Missing Google authorization code")
+
+        cookie_state = request.cookies.get("oauth_state")
+        if not cookie_state or cookie_state != state:
+            return fail("Invalid OAuth state")
+
+        client_id = _google_client_id()
+        client_secret = _google_client_secret()
+        if not client_id or not client_secret:
+            return fail("Google OAuth is not configured")
+
+        redirect_uri = _google_redirect_uri(request)
+        try:
+            async with httpx.AsyncClient(timeout=20) as http:
+                token_res = await http.post(
+                    GOOGLE_TOKEN_URL,
+                    data={
+                        "code": code,
+                        "client_id": client_id,
+                        "client_secret": client_secret,
+                        "redirect_uri": redirect_uri,
+                        "grant_type": "authorization_code",
+                    },
+                    headers={"Accept": "application/json"},
+                )
+                if token_res.status_code != 200:
+                    logger.warning("Google token exchange failed: %s %s", token_res.status_code, token_res.text[:300])
+                    return fail("Google authentication failed")
+                tokens = token_res.json()
+                access_token = tokens.get("access_token")
+                if not access_token:
+                    return fail("Google authentication failed")
+
+                info_res = await http.get(
+                    GOOGLE_USERINFO_URL,
+                    headers={"Authorization": f"Bearer {access_token}"},
+                )
+                if info_res.status_code != 200:
+                    logger.warning("Google userinfo failed: %s %s", info_res.status_code, info_res.text[:300])
+                    return fail("Google authentication failed")
+                data = info_res.json()
+        except Exception:
+            logger.exception("Google OAuth exchange error")
+            return fail("Auth service unreachable")
+
+        email = (data.get("email") or "").lower().strip()
+        name = data.get("name") or (email.split("@")[0] if email else "Admin")
         picture = data.get("picture")
-        session_token = data.get("session_token")
-        if not email or not session_token:
-            raise HTTPException(status_code=401, detail="Invalid Google response")
+        if not email:
+            return fail("Google did not return an email")
+        if data.get("email_verified") is False:
+            return fail("Google email is not verified")
 
         allowlist = _admin_allowlist()
         if allowlist and email not in allowlist:
-            # Do not create a session for non-admins
-            raise HTTPException(status_code=403, detail="This account is not authorized for the admin panel.")
+            return fail("This account is not authorized for the admin panel")
 
-        # Upsert user (custom user_id, never expose _id)
-        existing = await db.users.find_one({"email": email}, {"_id": 0})
-        now = datetime.now(timezone.utc)
-        if existing:
-            user_id = existing["user_id"]
-            await db.users.update_one(
-                {"user_id": user_id},
-                {"$set": {"name": name, "picture": picture, "last_login": now.isoformat()}},
-            )
-        else:
-            user_id = f"user_{os.urandom(6).hex()}"
-            await db.users.insert_one({
-                "user_id": user_id,
-                "email": email,
-                "name": name,
-                "picture": picture,
-                "role": "chief" if email == "hello.adcommedia@gmail.com" else "admin",
-                "created_at": now.isoformat(),
-                "last_login": now.isoformat(),
-            })
-
-        # Store session
+        user_id, role, now = await _upsert_google_user(db, email, name, picture)
+        session_token = f"ggl_{secrets.token_urlsafe(48)}"
         expires = now + timedelta(days=SESSION_TTL_DAYS)
         await db.user_sessions.insert_one({
             "user_id": user_id,
             "session_token": session_token,
             "expires_at": expires.isoformat(),
             "created_at": now.isoformat(),
+            "kind": "google",
         })
 
-        # Set HttpOnly cookie
-        response.set_cookie(
-            key="session_token",
-            value=session_token,
-            httponly=True,
-            secure=True,
-            samesite="none",
-            path="/",
-            max_age=SESSION_TTL_DAYS * 24 * 60 * 60,
+        response = RedirectResponse(f"{frontend}/adcom-admin", status_code=302)
+        _set_session_cookie(response, session_token)
+        response.delete_cookie("oauth_state", path="/")
+        return response
+
+    @router.post("/session")
+    async def exchange_session_removed():
+        """Legacy Emergent session exchange — removed in favor of Google OAuth."""
+        raise HTTPException(
+            status_code=410,
+            detail="Emergent auth is no longer supported. Use Continue with Google or email/password login.",
         )
-        return {
-            "user": {
-                "user_id": user_id,
-                "email": email,
-                "name": name,
-                "picture": picture,
-                "role": "chief" if email == "hello.adcommedia@gmail.com" else "admin",
-            }
-        }
 
     @router.get("/me", response_model=AuthUser)
     async def me(user: AuthUser = Depends(get_current_user)):
@@ -268,15 +364,7 @@ def build_auth_router(db) -> APIRouter:
         })
         await db.users.update_one({"user_id": user_doc["user_id"]}, {"$set": {"last_login": now.isoformat()}})
 
-        response.set_cookie(
-            key="session_token",
-            value=token,
-            httponly=True,
-            secure=True,
-            samesite="none",
-            path="/",
-            max_age=SESSION_TTL_DAYS * 24 * 60 * 60,
-        )
+        _set_session_cookie(response, token)
         return {
             "user": {
                 "user_id": user_doc["user_id"],

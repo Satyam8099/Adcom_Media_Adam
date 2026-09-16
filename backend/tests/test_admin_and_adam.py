@@ -2,7 +2,7 @@
 
 Covers:
 - /api/blogs (public list + get w/ view counter)
-- /api/auth/me + /api/auth/logout + /api/auth/session negative
+- /api/auth/me + /api/auth/logout + legacy /api/auth/session (410) + Google OAuth start
 - Admin-protected /api/admin/blogs (unauth 401, non-allowlisted 403, full CRUD)
 - Admin analytics recompute
 - /api/adam/status, /api/adam/scrape, /api/adam/chat (SSE), /api/adam/roadmap
@@ -132,9 +132,14 @@ class TestAuth:
         body = r.json()
         assert body["email"] == "hello.adcommedia@gmail.com"
 
-    def test_session_exchange_garbage_returns_401(self, s):
+    def test_legacy_session_exchange_gone(self, s):
         r = requests.post(f"{API}/auth/session", json={"session_id": "garbage_garbage_garbage"}, timeout=25)
-        assert r.status_code in (401, 502), r.text
+        assert r.status_code == 410, r.text
+
+    def test_google_oauth_start_requires_config_or_redirects(self, s):
+        r = requests.get(f"{API}/auth/google/start", allow_redirects=False, timeout=20)
+        # 503 when GOOGLE_CLIENT_ID missing; 302 when configured
+        assert r.status_code in (302, 503), r.text
 
     def test_logout_deletes_session(self, s):
         # create disposable session

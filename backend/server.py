@@ -263,7 +263,7 @@ async def adam_voice(req: VoiceRequest):
 
 app.include_router(api_router)
 
-# Auth (Emergent Google OAuth) + Blog CMS + ADAM Intelligence
+# Auth (Google OAuth + password) + Blog CMS + ADAM Intelligence
 _auth_router, _get_current_user, _require_admin = build_auth_router(db)
 app.include_router(_auth_router)
 app.include_router(build_blog_router(db, _require_admin))
