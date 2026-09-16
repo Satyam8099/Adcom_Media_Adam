@@ -3,9 +3,9 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Check, Loader2, Phone, Mail } from 'lucide-react';
 import { CONTACT } from '@/constants/testIds';
+import { API_URL } from '@/lib/api';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+const API = API_URL;
 
 const capabilities = [
   'Growth Marketing',

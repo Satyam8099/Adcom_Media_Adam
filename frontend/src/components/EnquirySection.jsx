@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Check, Loader2 } from 'lucide-react';
+import { API_URL } from '@/lib/api';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = API_URL;
 
 /**
  * EnquirySection, a compact, on-brand enquiry form that matches Contact.jsx styling.
