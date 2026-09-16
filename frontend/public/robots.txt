@@ -7,9 +7,11 @@ Disallow: /adcom-admin
 Disallow: /adcom-admin/
 Disallow: /api/
 
-# OAuth callback / session fragments
+# OAuth / auth surfaces
+Disallow: /api/auth/
 Disallow: /*?session_id=
 Disallow: /*#session_id=
+Disallow: /*?error=
 
 # Sitemap
 Sitemap: https://www.adcommedia.com/api/sitemap.xml

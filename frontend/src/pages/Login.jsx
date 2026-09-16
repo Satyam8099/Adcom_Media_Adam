@@ -2,12 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, Lock, Eye, EyeOff, ShieldCheck } from 'lucide-react';
-import { apiGet, apiPost } from '@/lib/api';
+import { apiGet, apiPost, API_URL } from '@/lib/api';
 
-// REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
 function goToGoogleAuth() {
-  const redirectUrl = window.location.origin + '/adcom-admin';
-  window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
+  window.location.href = `${API_URL}/auth/google/start`;
 }
 
 const STATES = { IDLE: 'idle', AUTHENTICATING: 'authenticating', GRANTED: 'granted', DENIED: 'denied' };
@@ -26,10 +24,21 @@ export default function Login() {
     return () => document.body.classList.remove('native-cursor');
   }, []);
 
-  // If already signed in, bounce to admin
   useEffect(() => {
     apiGet('/auth/me').then(() => navigate('/adcom-admin', { replace: true })).catch(() => {});
   }, [navigate]);
+
+  // Surface Google OAuth callback errors (?error=…)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const oauthError = params.get('error');
+    if (!oauthError) return;
+    setStatus(STATES.DENIED);
+    setError(oauthError);
+    window.history.replaceState(null, '', '/login');
+    const t = setTimeout(() => setStatus(STATES.IDLE), 3200);
+    return () => clearTimeout(t);
+  }, [location.search]);
 
   const submit = async (e) => {
     e?.preventDefault?.();

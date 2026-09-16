@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
@@ -49,7 +49,6 @@ import CaseStudyProfotech from '@/pages/CaseStudyProfotech';
 import CaseStudyAusTyre from '@/pages/CaseStudyAusTyre';
 import CaseStudySkylarr from '@/pages/CaseStudySkylarr';
 import AdminPanel from '@/pages/admin/AdminPanel';
-import AdminAuthCallback from '@/pages/admin/AdminAuthCallback';
 import Login from '@/pages/Login';
 import useSEO from '@/hooks/useSEO';
 
@@ -77,12 +76,6 @@ function Landing() {
 }
 
 function AppRouter() {
-  // Detect Google OAuth callback synchronously from the URL fragment
-  // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
-  const location = useLocation();
-  if (location.hash && location.hash.includes('session_id=')) {
-    return <AdminAuthCallback />;
-  }
   return (
     <>
       <WhatsAppButton />
