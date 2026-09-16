@@ -23,10 +23,9 @@ GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/auth"
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
 
-# Production defaults for Vercel (frontend) + Render (API)
-# OAuth callback goes through Vercel /api rewrite so the session cookie is first-party on adcommedia.in
+# Production defaults: Vercel frontend + Render API custom domain
 DEFAULT_FRONTEND_URL = "https://adcommedia.in"
-DEFAULT_GOOGLE_REDIRECT_URI = "https://adcommedia.in/api/auth/google/callback"
+DEFAULT_GOOGLE_REDIRECT_URI = "https://api.adcommedia.in/api/auth/google/callback"
 
 
 def _admin_allowlist() -> set:

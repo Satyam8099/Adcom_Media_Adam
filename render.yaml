@@ -9,7 +9,7 @@ services:
       - key: PYTHON_VERSION
         value: "3.11.0"
       - key: GOOGLE_REDIRECT_URI
-        value: https://adcommedia.in/api/auth/google/callback
+        value: https://api.adcommedia.in/api/auth/google/callback
       - key: PUBLIC_SITE_URL
         value: https://adcommedia.in
       - key: FRONTEND_URL
