@@ -17,7 +17,9 @@ services:
       - key: CORS_ORIGINS
         value: https://adcommedia.in,https://www.adcommedia.in
       - key: COOKIE_SAMESITE
-        value: lax
+        value: none
+      - key: COOKIE_DOMAIN
+        value: adcommedia.in
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET
