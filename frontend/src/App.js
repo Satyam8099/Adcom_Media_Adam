@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
+import { trackPageView } from '@/lib/analytics';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import Marquee from '@/components/Marquee';
@@ -53,6 +54,14 @@ import Login from '@/pages/Login';
 import GoogleAuthDone from '@/pages/GoogleAuthDone';
 import useSEO from '@/hooks/useSEO';
 
+function AnalyticsTracker() {
+  const location = useLocation();
+  useEffect(() => {
+    trackPageView(location);
+  }, [location]);
+  return null;
+}
+
 function Landing() {
   useSEO('home');
   return (
@@ -79,6 +88,7 @@ function Landing() {
 function AppRouter() {
   return (
     <>
+      <AnalyticsTracker />
       <WhatsAppButton />
       <SecretInfoButton />
       <AdamProtocol />
