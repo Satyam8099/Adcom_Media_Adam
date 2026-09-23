@@ -23,12 +23,17 @@ export default function GoogleAuthDone() {
       navigate('/login?error=' + encodeURIComponent('Missing Google sign-in code'), { replace: true });
       return;
     }
+    // StrictMode mounts this page twice. Only the first call should exchange.
+    const guardKey = `adcom_ggl_${code}`;
+    if (sessionStorage.getItem(guardKey) === '1') return;
+    sessionStorage.setItem(guardKey, '1');
 
     (async () => {
       try {
         const data = await apiPost('/auth/google/exchange', { code });
         navigate('/adcom-admin', { replace: true, state: { user: data.user } });
       } catch (e) {
+        sessionStorage.removeItem(guardKey);
         setError(e.message || 'Google sign-in failed');
         setTimeout(() => {
           navigate('/login?error=' + encodeURIComponent(e.message || 'Google sign-in failed'), { replace: true });
