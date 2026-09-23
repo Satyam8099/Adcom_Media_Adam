@@ -55,8 +55,8 @@ class TestPasswordLogin:
         assert r.status_code == 401
         assert r.json().get("detail") == "Invalid credentials"
 
-    def test_login_non_allowlisted_same_401(self):
-        # Seed a user directly with valid password_hash but not in allowlist
+    def test_login_without_allowlist_succeeds(self):
+        # A real password is enough. ADMIN_ALLOWLIST is not required.
         import bcrypt
         email = "not_allowed@example.com"
         _db.users.delete_many({"email": email})
@@ -71,8 +71,8 @@ class TestPasswordLogin:
         try:
             r = requests.post(f"{BASE_URL}/api/auth/login",
                               json={"email": email, "password": "pw12345"}, timeout=15)
-            assert r.status_code == 401
-            assert r.json().get("detail") == "Invalid credentials"
+            assert r.status_code == 200
+            assert r.json()["user"]["email"] == email
         finally:
             _db.users.delete_many({"email": email})
 

@@ -28,11 +28,6 @@ DEFAULT_FRONTEND_URL = "https://adcommedia.in"
 DEFAULT_GOOGLE_REDIRECT_URI = "https://api.adcommedia.in/api/auth/google/callback"
 
 
-def _admin_allowlist() -> set:
-    raw = os.environ.get("ADMIN_ALLOWLIST", "")
-    return {e.strip().lower() for e in raw.split(",") if e.strip()}
-
-
 def _frontend_url() -> str:
     return (
         os.environ.get("PUBLIC_SITE_URL")
@@ -267,9 +262,6 @@ def build_auth_router(db) -> APIRouter:
         return AuthUser(**user_doc)
 
     async def require_admin(user: AuthUser = Depends(get_current_user)) -> AuthUser:
-        allowlist = _admin_allowlist()
-        if allowlist and user.email.lower() not in allowlist:
-            raise HTTPException(status_code=403, detail="Not authorized")
         return user
 
     @router.get("/google/start")
@@ -370,11 +362,6 @@ def build_auth_router(db) -> APIRouter:
         if data.get("email_verified") is False:
             return fail("Google email is not verified")
 
-        allowlist = _admin_allowlist()
-        if allowlist and email not in allowlist:
-            logger.warning("Google sign-in refused for %s: not in ADMIN_ALLOWLIST", email)
-            return fail("This account is not authorized for the admin panel")
-
         user_id, _role, now = await _upsert_google_user(db, email, name, picture)
         session_token = f"ggl_{secrets.token_urlsafe(48)}"
         expires = now + timedelta(days=SESSION_TTL_DAYS)
@@ -461,10 +448,8 @@ def build_auth_router(db) -> APIRouter:
             raise HTTPException(status_code=429, detail="Too many attempts. Try again in 15 minutes.")
 
         user_doc = await db.users.find_one({"email": email}, {"_id": 0})
-        allowlist = _admin_allowlist()
-        allowed = (not allowlist) or (email in allowlist)
         ok = False
-        if user_doc and user_doc.get("password_hash") and allowed:
+        if user_doc and user_doc.get("password_hash"):
             ok = _verify_password(payload.password, user_doc["password_hash"])
 
         if not ok:
