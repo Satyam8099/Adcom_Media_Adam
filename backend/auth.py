@@ -4,7 +4,7 @@ import logging
 import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-from urllib.parse import urlencode, quote
+from urllib.parse import urlencode, quote, urlparse
 
 import bcrypt
 import httpx
@@ -67,9 +67,31 @@ def _verify_password(plain: str, hashed: str) -> bool:
         return False
 
 
-def _cookie_samesite() -> str:
-    # Cross-subdomain (adcommedia.in → api.adcommedia.in) needs "none"
-    return (os.environ.get("COOKIE_SAMESITE") or "none").strip().lower() or "none"
+def _site_host() -> str:
+    return (urlparse(_frontend_url()).hostname or "").lower()
+
+
+def _cookie_samesite_for_request(request: Request) -> str:
+    """Use Lax when the API host is the site or a subdomain of it.
+
+    adcommedia.in → api.adcommedia.in is same-site, so the session cookie must
+    be Lax. SameSite=None is a third-party cookie; Chrome drops it, and the
+    next /api/auth/me call is 401 even after Google returns 200.
+    """
+    host = _request_host(request)
+    bases = set()
+    site = _site_host()
+    if site:
+        bases.add(site)
+    configured = (os.environ.get("COOKIE_DOMAIN") or "").strip().lstrip(".").lower()
+    if configured:
+        bases.add(configured)
+    if host and any(host == base or host.endswith("." + base) for base in bases):
+        return "lax"
+    explicit = (os.environ.get("COOKIE_SAMESITE") or "none").strip().lower()
+    if explicit in ("lax", "strict", "none"):
+        return explicit
+    return "none"
 
 
 def _request_host(request: Request) -> str:
@@ -78,12 +100,15 @@ def _request_host(request: Request) -> str:
 
 
 def _cookie_domain_for_request(request: Request) -> Optional[str]:
-    """Set Domain only when this response host is actually under COOKIE_DOMAIN.
+    """Set Domain only when this response host is actually under the site domain.
 
-    Browsers drop Set-Cookie if Domain does not match the host (for example a
-    cookie for adcommedia.in returned by *.onrender.com).
+    The OAuth callback is on api.adcommedia.in, and the browser then calls
+    https://adcommedia.in/api/auth/me. Domain=adcommedia.in is what makes that
+    cookie visible to the site. Browsers drop Set-Cookie if Domain does not
+    match the host (for example a cookie for adcommedia.in returned by
+    *.onrender.com).
     """
-    configured = (os.environ.get("COOKIE_DOMAIN") or "").strip().lstrip(".")
+    configured = (os.environ.get("COOKIE_DOMAIN") or _site_host()).strip().lstrip(".")
     host = _request_host(request)
     if not configured or not host:
         return None
@@ -93,7 +118,7 @@ def _cookie_domain_for_request(request: Request) -> Optional[str]:
 
 
 def _set_session_cookie(response: Response, token: str, request: Request):
-    samesite = _cookie_samesite()
+    samesite = _cookie_samesite_for_request(request)
     kwargs = {
         "key": "session_token",
         "value": token,
@@ -110,12 +135,20 @@ def _set_session_cookie(response: Response, token: str, request: Request):
 
 
 def _clear_session_cookie(response: Response, request: Request):
-    response.delete_cookie("session_token", path="/", samesite=_cookie_samesite(), secure=True)
+    samesite = _cookie_samesite_for_request(request)
+    response.delete_cookie("session_token", path="/", samesite=samesite, secure=True)
+    # Also drop a cookie that was previously stored as SameSite=None.
+    if samesite != "none":
+        response.delete_cookie("session_token", path="/", samesite="none", secure=True)
     domain = _cookie_domain_for_request(request)
     if domain:
         response.delete_cookie(
-            "session_token", path="/", samesite=_cookie_samesite(), secure=True, domain=domain
+            "session_token", path="/", samesite=samesite, secure=True, domain=domain
         )
+        if samesite != "none":
+            response.delete_cookie(
+                "session_token", path="/", samesite="none", secure=True, domain=domain
+            )
 
 
 class GoogleExchangeRequest(BaseModel):
@@ -258,15 +291,19 @@ def build_auth_router(db) -> APIRouter:
             "state": state,
         }
         response = RedirectResponse(f"{GOOGLE_AUTH_URL}?{urlencode(params)}", status_code=302)
-        response.set_cookie(
-            key="oauth_state",
-            value=state,
-            httponly=True,
-            secure=True,
-            samesite="lax",
-            path="/",
-            max_age=OAUTH_STATE_TTL_SEC,
-        )
+        state_cookie = {
+            "key": "oauth_state",
+            "value": state,
+            "httponly": True,
+            "secure": True,
+            "samesite": "lax",
+            "path": "/",
+            "max_age": OAUTH_STATE_TTL_SEC,
+        }
+        domain = _cookie_domain_for_request(request)
+        if domain:
+            state_cookie["domain"] = domain
+        response.set_cookie(**state_cookie)
         return response
 
     @router.get("/google/callback")
@@ -335,9 +372,10 @@ def build_auth_router(db) -> APIRouter:
 
         allowlist = _admin_allowlist()
         if allowlist and email not in allowlist:
+            logger.warning("Google sign-in refused for %s: not in ADMIN_ALLOWLIST", email)
             return fail("This account is not authorized for the admin panel")
 
-        user_id, role, now = await _upsert_google_user(db, email, name, picture)
+        user_id, _role, now = await _upsert_google_user(db, email, name, picture)
         session_token = f"ggl_{secrets.token_urlsafe(48)}"
         expires = now + timedelta(days=SESSION_TTL_DAYS)
         await db.user_sessions.insert_one({
@@ -348,25 +386,17 @@ def build_auth_router(db) -> APIRouter:
             "kind": "google",
         })
 
-        # One-time code → frontend XHR sets cookie (avoids Set-Cookie lost on OAuth 302)
-        exchange_code = secrets.token_urlsafe(32)
-        await db.oauth_exchanges.insert_one({
-            "code": exchange_code,
-            "session_token": session_token,
-            "user_id": user_id,
-            "email": email,
-            "name": name,
-            "picture": picture,
-            "role": role,
-            "expires_at": (now + timedelta(minutes=5)).isoformat(),
-            "created_at": now.isoformat(),
-        })
-
-        response = RedirectResponse(
-            f"{frontend}/auth/google/done?code={quote(exchange_code)}",
-            status_code=302,
-        )
-        response.delete_cookie("oauth_state", path="/")
+        response = RedirectResponse(f"{frontend}/adcom-admin", status_code=302)
+        response.delete_cookie("oauth_state", path="/", secure=True, samesite="lax")
+        domain = _cookie_domain_for_request(request)
+        if domain:
+            response.delete_cookie(
+                "oauth_state", path="/", secure=True, samesite="lax", domain=domain
+            )
+        # Domain=adcommedia.in so the browser sends this cookie to
+        # https://adcommedia.in/api/auth/me (same-origin, proxied by Vercel).
+        _set_session_cookie(response, session_token, request)
+        logger.info("Google sign-in ok for %s", email)
         return response
 
     @router.post("/google/exchange")
