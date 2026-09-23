@@ -150,7 +150,7 @@ def build_admin_extras_router(db, require_admin) -> APIRouter:
     async def apply_page_seo_defaults(user=Depends(require_admin)):
         """Write curated titles/descriptions into page_seo so they show in CMS and on the site."""
         from page_seo_defaults import seed_page_seo
-        count = await seed_page_seo(db)
+        count = await seed_page_seo(db, overwrite=True)
         return {"ok": True, "applied": count}
 
     @router.put("/pages/{key}")
