@@ -97,4 +97,21 @@ if (isDevServer) {
   }
 }
 
-module.exports = webpackConfig;
+function withApiProxy(config) {
+  const original = config.devServer;
+  const target = (process.env.REACT_APP_BACKEND_URL || "http://localhost:8000").replace(/\/$/, "");
+  config.devServer = (devServerConfig) => {
+    const next = typeof original === "function" ? original(devServerConfig) : (devServerConfig || {});
+    const entry = { target, changeOrigin: true, secure: false };
+    if (Array.isArray(next.proxy)) {
+      next.proxy = next.proxy.filter((rule) => rule.context !== "/api" && !(Array.isArray(rule.context) && rule.context.includes("/api")));
+      next.proxy.push({ context: ["/api"], ...entry });
+    } else {
+      next.proxy = { ...(next.proxy || {}), "/api": entry };
+    }
+    return next;
+  };
+  return config;
+}
+
+module.exports = withApiProxy(webpackConfig);
