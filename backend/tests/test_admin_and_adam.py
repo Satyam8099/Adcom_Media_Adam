@@ -3,7 +3,7 @@
 Covers:
 - /api/blogs (public list + get w/ view counter)
 - /api/auth/me + /api/auth/logout + legacy /api/auth/session (410) + Google OAuth start
-- Admin-protected /api/admin/blogs (unauth 401, non-allowlisted 403, full CRUD)
+- Admin-protected /api/admin/blogs (unauth 401, any authenticated user allowed, full CRUD)
 - Admin analytics recompute
 - /api/adam/status, /api/adam/scrape, /api/adam/chat (SSE), /api/adam/roadmap
 - /api/contact regression w/ source=adam-workspace
@@ -174,9 +174,9 @@ class TestAdminAuthGuards:
         r = requests.get(f"{API}/admin/analytics", timeout=20)
         assert r.status_code == 401
 
-    def test_nonadmin_email_403(self, s, nonadmin_token):
+    def test_any_authenticated_user_can_open_cms(self, s, nonadmin_token):
         r = requests.get(f"{API}/admin/analytics", headers=_auth(nonadmin_token), timeout=20)
-        assert r.status_code == 403
+        assert r.status_code == 200
 
 
 # ---------- Admin CRUD full flow ----------
