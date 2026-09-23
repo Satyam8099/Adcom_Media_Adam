@@ -172,24 +172,30 @@ PAGE_SEO_DEFAULTS = {
 }
 
 
-async def seed_page_seo(db) -> int:
-    """Upsert curated SEO title + description for every catalog page. Returns upsert count."""
+async def seed_page_seo(db, overwrite: bool = False) -> int:
+    """Insert curated SEO for pages that have none yet.
+
+    overwrite=True replaces existing titles (admin "Apply curated SEO").
+    Startup uses overwrite=False so CMS edits survive a restart.
+    """
     from datetime import datetime, timezone
 
     now = datetime.now(timezone.utc).isoformat()
     count = 0
     for key, meta in PAGE_SEO_DEFAULTS.items():
-        await db.page_seo.update_one(
-            {"key": key},
-            {
-                "$set": {
-                    "key": key,
-                    "seo_title": meta["seo_title"],
-                    "meta_description": meta["meta_description"],
-                    "updated_at": now,
-                }
-            },
-            upsert=True,
-        )
+        fields = {
+            "key": key,
+            "seo_title": meta["seo_title"],
+            "meta_description": meta["meta_description"],
+            "updated_at": now,
+        }
+        if overwrite:
+            await db.page_seo.update_one({"key": key}, {"$set": fields}, upsert=True)
+        else:
+            await db.page_seo.update_one(
+                {"key": key},
+                {"$setOnInsert": fields},
+                upsert=True,
+            )
         count += 1
     return count

@@ -72,12 +72,27 @@ def _cookie_samesite() -> str:
     return (os.environ.get("COOKIE_SAMESITE") or "none").strip().lower() or "none"
 
 
-def _cookie_domain() -> Optional[str]:
-    # e.g. "adcommedia.in" so cookie is valid for api.adcommedia.in
-    return (os.environ.get("COOKIE_DOMAIN") or "adcommedia.in").strip() or None
+def _request_host(request: Request) -> str:
+    raw = (request.headers.get("x-forwarded-host") or request.url.hostname or "")
+    return raw.split(",")[0].strip().split(":")[0].lower()
 
 
-def _set_session_cookie(response: Response, token: str):
+def _cookie_domain_for_request(request: Request) -> Optional[str]:
+    """Set Domain only when this response host is actually under COOKIE_DOMAIN.
+
+    Browsers drop Set-Cookie if Domain does not match the host (for example a
+    cookie for adcommedia.in returned by *.onrender.com).
+    """
+    configured = (os.environ.get("COOKIE_DOMAIN") or "").strip().lstrip(".")
+    host = _request_host(request)
+    if not configured or not host:
+        return None
+    if host == configured or host.endswith("." + configured):
+        return configured
+    return None
+
+
+def _set_session_cookie(response: Response, token: str, request: Request):
     samesite = _cookie_samesite()
     kwargs = {
         "key": "session_token",
@@ -88,16 +103,15 @@ def _set_session_cookie(response: Response, token: str):
         "path": "/",
         "max_age": SESSION_TTL_DAYS * 24 * 60 * 60,
     }
-    domain = _cookie_domain()
+    domain = _cookie_domain_for_request(request)
     if domain:
         kwargs["domain"] = domain
     response.set_cookie(**kwargs)
 
 
-def _clear_session_cookie(response: Response):
-    # Clear host-only and domain-scoped variants
+def _clear_session_cookie(response: Response, request: Request):
     response.delete_cookie("session_token", path="/", samesite=_cookie_samesite(), secure=True)
-    domain = _cookie_domain()
+    domain = _cookie_domain_for_request(request)
     if domain:
         response.delete_cookie(
             "session_token", path="/", samesite=_cookie_samesite(), secure=True, domain=domain
@@ -356,8 +370,12 @@ def build_auth_router(db) -> APIRouter:
         return response
 
     @router.post("/google/exchange")
-    async def google_exchange(payload: GoogleExchangeRequest, response: Response):
-        """Frontend exchanges one-time OAuth code for a session cookie (credentialed XHR)."""
+    async def google_exchange(payload: GoogleExchangeRequest, request: Request, response: Response):
+        """Frontend exchanges the short-lived OAuth code for a session cookie.
+
+        The code stays valid until it expires so a second call (React StrictMode)
+        still receives the same session instead of a 401.
+        """
         now = datetime.now(timezone.utc)
         doc = await db.oauth_exchanges.find_one({"code": payload.code}, {"_id": 0})
         if not doc:
@@ -365,13 +383,13 @@ def build_auth_router(db) -> APIRouter:
         exp = doc.get("expires_at")
         if isinstance(exp, str):
             exp = datetime.fromisoformat(exp)
-        if exp.tzinfo is None:
+        if exp and exp.tzinfo is None:
             exp = exp.replace(tzinfo=timezone.utc)
-        await db.oauth_exchanges.delete_one({"code": payload.code})
-        if exp < now:
+        if not exp or exp < now:
+            await db.oauth_exchanges.delete_one({"code": payload.code})
             raise HTTPException(status_code=401, detail="Google sign-in code expired")
 
-        _set_session_cookie(response, doc["session_token"])
+        _set_session_cookie(response, doc["session_token"], request)
         return {
             "user": {
                 "user_id": doc["user_id"],
@@ -444,7 +462,7 @@ def build_auth_router(db) -> APIRouter:
         })
         await db.users.update_one({"user_id": user_doc["user_id"]}, {"$set": {"last_login": now.isoformat()}})
 
-        _set_session_cookie(response, token)
+        _set_session_cookie(response, token, request)
         return {
             "user": {
                 "user_id": user_doc["user_id"],
@@ -460,7 +478,7 @@ def build_auth_router(db) -> APIRouter:
         token = request.cookies.get("session_token")
         if token:
             await db.user_sessions.delete_one({"session_token": token})
-        _clear_session_cookie(response)
+        _clear_session_cookie(response, request)
         return {"ok": True}
 
     @router.post("/change-password")
